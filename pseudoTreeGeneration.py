@@ -61,7 +61,8 @@ def start( agent ):
 
         # Invio a tutti gli altri nodi i rispettivi valori di p, pp, c e pc
         for node in graph:
-            agent.sendMsg(node, msgType.PTINFO, (parents[node], pseudo_parent[node], pseudotree[node], pseudo_children[node]) )
+            if node is not agent.id:
+                agent.sendMsg(node, msgType.PTINFO, (parents[node], pseudo_parent[node], pseudotree[node], pseudo_children[node]) )
 
         # A tutti i miei sottoposti, sia reali sia pseudo, invio il mio dominio
         for child in agent.c + agent.pc:
@@ -77,11 +78,13 @@ def start( agent ):
 
         # Attendo che la root mi restituisca le PTINFO
         key_msg_ptinfo = (int(agent.rootID), str(msgType.PTINFO))
+
         while key_msg_ptinfo not in agent.msgs:
             time.sleep(0.5)
             pass
 
-        agent.p, agent.pp, agent.c, agent.pc = agent.msgs[ key_msg_ptinfo ]
+        msg_ptinfo = agent.msgs[ key_msg_ptinfo ]
+        agent.p, agent.pp, agent.c, agent.pc = msg_ptinfo.value
 
         # A tutti i miei sottoposti, sia reali sia pseudo, invio il mio dominio
         for child in agent.c + agent.pc:
