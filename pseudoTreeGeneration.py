@@ -1,6 +1,5 @@
 import time
 from message import MessageType as msgType
-from message import Message as message
 import dfsPseudotree as dfs
 
 def start( agent ):
