@@ -40,6 +40,11 @@ def start( agent ):
         if agent.isRoot:
             agent.debug("Sono la ROOT, da me partira' la VALUE Propagation")
             agent.debug(agent.msgs)
+            for m in agent.msgs:
+                msg = agent.msgs[m]
+                agent.debug(msg.sender)
+                agent.debug(msg.type)
+                agent.debug(msg.value)
             return
 
         # Proseguo nel caso in cui l'agente non sia root
@@ -54,22 +59,22 @@ def start( agent ):
             msg_type    = msg_key[1]
             msg         = agent.msgs[ msg_key ]
             if msg_type == msgType.UTIL:
-                rel = msg.value
-                if int(rel['dim2']) in received_utils:
-                    received_utils[ int(rel['dim2']) ] = received_utils[int(rel['dim2'])] + np.array(rel['rel'])
-                else:
-                    received_utils[ int(rel['dim2']) ] = np.array( rel['rel'] )
+                for rel in msg.value:
+                    if int(rel['dim2']) in received_utils:
+                        received_utils[ int(rel['dim2']) ] = received_utils[int(rel['dim2'])] + np.array(rel['rel'])
+                    else:
+                        received_utils[ int(rel['dim2']) ] = np.array( rel['rel'] )
 
         for idx, rel in enumerate(rels_raw):
             if int(rel['dim1']) in received_utils:
                 # Sommo lungo le righe
                 a = received_utils[ int(rel['dim1']) ]
                 b = a.reshape(1, len(a))
-                rels_raw[idx] = np.add(rels_raw[idx], b.T)
+                rels_raw[idx]['rel'] = np.add( rels_raw[idx]['rel'], b.T)
 
             if int(rel['dim2']) in received_utils:
                 # Sommo lungo le colonne
-                rels_raw[idx] = np.add(rels_raw[idx], received_utils[ int(rel['dim2']) ])
+                rels_raw[idx]['rel'] = np.add( rels_raw[idx]['rel'], received_utils[ int(rel['dim2']) ])
 
         # Ora non mi resta che sommare ad ognuna delle relazioni di questo agente i valori
         # presenti in cumulative_util, per poi proiettare ed inviare
@@ -83,4 +88,4 @@ def projectionOfAgentOnRelation(id, rel):
 
     return { 'dim1': rel['dim1'],
              'dim2': rel['dim2'],
-             'rel' : np.amax(rel, axis = 0) }
+             'rel' : np.amin(rel['rel'], axis = 0) } #np.amax(rel['rel'], axis = 0)

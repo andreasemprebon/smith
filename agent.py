@@ -184,33 +184,59 @@ class Agent:
 
         dest = self.otherAgents[ dest_node_id ]
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(pdata, (dest.addr, dest.port))
-        sock.close()
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect( (dest.addr, dest.port) )
+            res = sock.sendall( pdata )
+        except:
+            time.sleep(0.1)
+            sock.close()
+            self.sendMsg(dest_node_id, type, data)
+        finally:
+            sock.close()
 
     def listenToMessages(self):
-        listening_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        listening_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        #listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         listening_socket.bind( (self.host, self.port) )
 
         self.isListening = True
 
+        listening_socket.listen(1)
+
         while (True):
-            data, addr = listening_socket.recvfrom(65536)
-            udata = pickle.loads(data)
+            connection, client_address = listening_socket.accept()
+            connection.settimeout(60)
 
-            msg_sender  = udata[0]
-            msg_type    = udata[1]
-            msg_value   = udata[2]
+            threading.Thread(target  = self.handleArrivedMsg, kwargs = {'connection' : connection} ).start()
 
-            #self.debug( "[RICEZIONE] ({}, {}): {}".format(int(msg_sender), str(msg_type), msg_value ) )
-            self.msgs[ (int(msg_sender), str(msg_type)) ] = message.Message(msg_type, msg_sender, msg_value)
-
-            #self.debug( self.msgs )
 
         self.isListening = False
-        listening_socket.close()
+
+    def handleArrivedMsg(self, connection):
+        data = bytearray()
+
+        # Receive the data in small chunks
+        try:
+            while True:
+                tmp_data = connection.recv(16)
+                data += tmp_data
+                if not tmp_data:
+                    break
+        finally:
+            connection.close()
+
+        udata = pickle.loads(data)
+
+        msg_sender = udata[0]
+        msg_type = udata[1]
+        msg_value = udata[2]
+
+        # self.debug("[RICEZIONE] ({}, {}): {}".format(int(msg_sender), str(msg_type), msg_value))
+        self.msgs[(int(msg_sender), str(msg_type))] = message.Message(msg_type, msg_sender, msg_value)
+
+        # self.debug( self.msgs )
 
     def debug(self, text):
         print("[Agent {}]: {}".format(self.id, text))
