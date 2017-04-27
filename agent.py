@@ -2,7 +2,6 @@ import pickle
 import socket
 import threading
 import time
-import os
 import pseudoTreeGeneration
 import message
 import UTILMessagePropagation
@@ -19,7 +18,6 @@ class DiscoveredAgent:
         self.varsFromStartingPoint = None
 
     def getVarsFromStartingPoint(self, x):
-
         if not self.varsFromStartingPoint:
             return {'status': False,
                     'vars'  : np.array([0] * consts.kTIME_SLOTS) }
@@ -42,6 +40,7 @@ class Agent:
         self.port = port
 
         # Variabili Agente
+        self.name               = "Agent"
         self.isListening        = False
         self.id                 = i
         self.domain             = domain
@@ -81,8 +80,12 @@ class Agent:
 
         # Inizio ad ascoltare i messaggi in arrivo sulla mia porta
 
+    """
+    Ritorna una lista contente il ciclo che questo agente
+    vorrebbe effettuare
+    """
     def getCycle(self):
-        return [5, 10, 9, 18, 20]
+        raise NotImplementedError("Questo metodo deve essere implementato da ogni agente")
 
     """
     L'output è una tupla il cui primo elemento indica se l'assegnazione e fattibile, mentre il secondo
@@ -91,19 +94,7 @@ class Agent:
     OUTPUT (feasible, result)
     """
     def getVarsFromStartingPoint(self, x):
-        vars    = [0] * consts.kTIME_SLOTS
-        cycle   = self.getCycle()
-
-        cycle_length = len(cycle)
-
-        if ( cycle_length + x > consts.kTIME_SLOTS ):
-            return {    'status'    : False,
-                        'vars'      : np.array(vars) }
-
-        vars[x:cycle_length+x] = cycle
-
-        return {    'status'    : True,
-                    'vars'      : np.array(vars) }
+        raise NotImplementedError("Questo metodo deve essere implementato da ogni agente")
 
     """
     Prende tutti i possibili punti di inizio e crea un dict che li contiene. Questo dict
@@ -243,7 +234,7 @@ class Agent:
         # self.debug( self.msgs )
 
     def debug(self, text):
-        print("[Agent {}]: {}".format(self.id, text))
+        print("[{} {}]: {}".format(self.name, self.id, text))
 
     def start(self):
         self.listenToMessagesThread = threading.Thread(name='ListenToMessages-Thread-of-Agent-' + str(self.id),
@@ -270,74 +261,3 @@ class Agent:
         # dal loro genitore
         if not self.isRoot:
             VALUEMessagePropagation.start( self )
-
-a1 = Agent(1, range(0, 96), 12346)
-a2 = Agent(2, range(0, 96), 12347)
-a3 = Agent(3, range(0, 96), 12348)
-a4 = Agent(4, range(0, 96), 12349)
-
-a2.isRoot = False
-a3.isRoot = False
-a4.isRoot = False
-
-a1.addNewDiscoveredAgent(a2.id, "127.0.0.1", a2.port)
-a1.addNewDiscoveredAgent(a3.id, "127.0.0.1", a3.port)
-a1.addNewDiscoveredAgent(a4.id, "127.0.0.1", a4.port)
-
-a2.addNewDiscoveredAgent(a1.id, "127.0.0.1", a1.port)
-a2.addNewDiscoveredAgent(a3.id, "127.0.0.1", a3.port)
-a2.addNewDiscoveredAgent(a4.id, "127.0.0.1", a4.port)
-
-a3.addNewDiscoveredAgent(a1.id, "127.0.0.1", a1.port)
-a3.addNewDiscoveredAgent(a2.id, "127.0.0.1", a2.port)
-a3.addNewDiscoveredAgent(a4.id, "127.0.0.1", a4.port)
-
-a4.addNewDiscoveredAgent(a1.id, "127.0.0.1", a1.port)
-a4.addNewDiscoveredAgent(a2.id, "127.0.0.1", a2.port)
-a4.addNewDiscoveredAgent(a3.id, "127.0.0.1", a3.port)
-
-# while (not a1.isListening):
-#     time.sleep(0.5)
-#
-# while (not a2.isListening):
-#     time.sleep(0.5)
-#
-# while (not a3.isListening):
-#     time.sleep(0.5)
-
-"""
-Avvio i vari agenti sulla stessa macchina
-E' solamente il genitore che lancia, quindi mi salvo
-in parent_pid il valore del PID del processo attuale in modo
-che sia solo lui a fare la fork
-"""
-parent_pid = os.getpid()
-
-children = []
-
-#Avvio il primo processo figlio
-if parent_pid == os.getpid():
-    childid = os.fork()
-    children.append(childid)
-    if childid == 0:
-        a2.start()
-
-#Avvio il secondo processo figlio
-if parent_pid == os.getpid():
-    childid = os.fork()
-    children.append(childid)
-    if childid == 0:
-        a3.start()
-
-# Avvio il secondo processo figlio
-if parent_pid == os.getpid():
-    childid = os.fork()
-    children.append(childid)
-    if childid == 0:
-        a4.start()
-
-#Avvio il padre ed attendo che tutti i figli terminino
-if parent_pid == os.getpid():
-    a1.start()
-    for i in children:
-        os.wait()

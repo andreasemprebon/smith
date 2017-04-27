@@ -2,30 +2,35 @@ from agent import Agent
 import constants as consts
 import numpy as np
 
-class WashingMachineCycle():
-    IDLE      = {
-                    'name'  : 'idle',
-                    'power' : [0]
-                }
-    COTTON_60 = {
-                    'name'  : 'Cotton 60',
-                    'power' : [10, 15, 20, 8, 5]
-                }
-
-    COTTON_30 = {
-                    'name' : 'Cotton 30',
-                    'power': [1, 1, 3, 8, 10, 3, 2]
-                }
-
-class WashingMachine(Agent):
-    def __init__(self, id, addr, port):
+class Boiler(Agent):
+    def __init__(self, id, addr, port, qty):
         super().__init__(id, addr, port)
-        self.name               = "WashingMachine"
+        self.name               = "Boiler"
         self.timeToEndBefore    = None
-        self.cycle              = WashingMachineCycle.COTTON_60
+        self.min_qty = 0
+        self.max_qty = 100
+        self.setQty(qty)
+
+        # Consuma 10 quando è acceso
+        self.power_when_on = 10
+
+    # Imposta la quantità di acqua calda presente nel boiler
+    def setQty(self, val):
+        qty = max(val, self.min_qty)
+        qty = min(qty, self.max_qty)
+        self.qty = qty
+
+    # A partire da una certa quantità di acqua resituisce il tempo (misurato in numero di time step)
+    # necessario per raggiungere una quantità target
+    def getTimeToReachQty(self, target_qty):
+        if target_qty <= self.qty:
+            return 0
+        else:
+            return np.floor((target_qty - self.qty) / 5).astype(int)
 
     def getCycle(self):
-        return self.cycle['power']
+        duration = self.getTimeToReachQty(self.max_qty)
+        return [self.power_when_on] * duration
 
     def getVarsFromStartingPoint(self, x):
         vars    = [0] * consts.kTIME_SLOTS
