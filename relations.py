@@ -6,6 +6,10 @@ def createAllRelationForAgent(agent):
     relations = []
     for agent2 in [ agent.p ] + agent.pp:
         relations.append( getRelationBetween(agent, agent.otherAgents[ agent2 ]) )
+        # Mi salvo la relazione con il padre, mi servirà dopo durante
+        # la fase di VALUE propagation
+        if agent2 == agent.p:
+            agent.relationWithParent = relations[-1]
 
     return relations
 
@@ -57,7 +61,7 @@ def valueOfAssignmentPerAgents(x1, x2, agent1, agent2):
     # più di quanto viene consumato, allora il valore diventa 0
     _tmp_solar_panel = [0] * consts.kTIME_SLOTS
     _tmp_sp_power = [10, 0, 3, 4, 20, 7, 4, 3, 9, 12, 30]
-    _tmp_solar_panel[10:10+len(_tmp_sp_power)] = _tmp_sp_power
+    _tmp_solar_panel[20:20+len(_tmp_sp_power)] = _tmp_sp_power
 
     solar_panel = np.array( _tmp_solar_panel )
 

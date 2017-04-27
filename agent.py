@@ -6,6 +6,7 @@ import os
 import pseudoTreeGeneration
 import message
 import UTILMessagePropagation
+import VALUEMessagePropagation
 import numpy as np
 import constants as consts
 
@@ -15,26 +16,18 @@ class DiscoveredAgent:
         self.addr   = addr
         self.port   = port
         self.domain = None
-
-    ### TEMPORANEO
-    def getCycle(self):
-        return [5, 10, 9, 18, 20]
+        self.varsFromStartingPoint = None
 
     def getVarsFromStartingPoint(self, x):
-        vars    = [0] * consts.kTIME_SLOTS
-        cycle   = self.getCycle()
 
-        cycle_length = len(cycle)
+        if not self.varsFromStartingPoint:
+            return {'status': False,
+                    'vars'  : np.array([0] * consts.kTIME_SLOTS) }
 
-        if ( cycle_length + x > consts.kTIME_SLOTS ):
-            return {    'status'    : False,
-                        'vars'      : np.array(vars) }
+        vars = self.varsFromStartingPoint[x]
 
-        vars[x:cycle_length+x] = cycle
-
-        return {    'status'    : True,
-                    'vars'      : np.array(vars) }
-    ### TEMPORANEO
+        return {'status'    : vars['status'],
+                'vars'      : np.array(vars['vars']) }
 
 class Agent:
     def __init__(self, i, domain, port):
@@ -49,13 +42,14 @@ class Agent:
         self.port = port
 
         # Variabili Agente
-        self.isListening    = False
-        self.id             = i
-        self.domain         = domain
-        self.relations      = {}
-        self.otherAgents    = {}
-        self.isRoot         = True
-        self.rootID         = 1
+        self.isListening        = False
+        self.id                 = i
+        self.domain             = domain
+        self.relationWithParent = {}
+        self.otherAgents        = {}
+        self.isRoot             = True
+        self.rootID             = 1
+        self.value              = None
 
         self.p  = None  # The parent's id
         self.pp = None  # A list of the pseudo-parents' ids
@@ -110,6 +104,16 @@ class Agent:
 
         return {    'status'    : True,
                     'vars'      : np.array(vars) }
+
+    """
+    Prende tutti i possibili punti di inizio e crea un dict che li contiene. Questo dict
+    sarà poi mandato a tutti gli altri agenti durante la creazione dello pseudoTree
+    """
+    def getVarsFromAllStartingPoints(self):
+        all_vars = {}
+        for t in range(0, consts.kTIME_SLOTS):
+            all_vars[t] = self.getVarsFromStartingPoint(t)
+        return all_vars
 
     """
     Se un nodo e' foglia, non ha figli, quindi vero se il numero di figli
@@ -255,16 +259,17 @@ class Agent:
 
         # Avvio la procedura per la creazione dello pseudo-tree
         pseudoTreeGeneration.start( self )
-        self.debug("Parent: {}".format(self.p))
-        self.debug("Pseudo-Parent: {}".format(self.pp))
-        self.debug("Children: {}".format(self.c))
-        self.debug("Pseudo-Children: {}".format(self.pc))
 
         # Resetto il contenuto del dict messaggi
         self.msgs = {}
 
         # Avvio la procedura di propagazione dei messaggi di UTIL
         UTILMessagePropagation.start( self )
+
+        # Solamente gli agenti NON root devono attendere il messaggio di VALUE
+        # dal loro genitore
+        if not self.isRoot:
+            VALUEMessagePropagation.start( self )
 
 a1 = Agent(1, range(0, 96), 12346)
 a2 = Agent(2, range(0, 96), 12347)

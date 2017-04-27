@@ -8,7 +8,7 @@ def start( agent ):
     agent.debug("Starting UTIL Message propagation...")
 
     if agent.isLeaf():
-        agent.debug("Sono una foglia")
+        #agent.debug("Sono una foglia")
 
         # Ottengo una lista con tutte le relazioni per quell'agente
         rels_raw = relations.createAllRelationForAgent( agent )
@@ -23,7 +23,7 @@ def start( agent ):
         agent.sendMsg(agent.p, msgType.UTIL, rels)
 
     else:
-        agent.debug("Non foglia")
+        #agent.debug("Non foglia")
 
         # Attendo che arrivino tutti i messaggi dai figli (solamente children, NON pseudo-children)
         while True:
@@ -38,13 +38,23 @@ def start( agent ):
                 break
 
         if agent.isRoot:
-            agent.debug("Sono la ROOT, da me partira' la VALUE Propagation")
-            agent.debug(agent.msgs)
-            for m in agent.msgs:
-                msg = agent.msgs[m]
-                agent.debug(msg.sender)
-                agent.debug(msg.type)
-                agent.debug(msg.value)
+            root_util = None
+            for msg_key in agent.msgs:
+                # sender_id   = msg_key[0]
+                msg_type = msg_key[1]
+                msg = agent.msgs[msg_key]
+                if msg_type == msgType.UTIL:
+                    # msg.value[0] e NON msg.value perché la ROOT nel nostro caso riceve
+                    # solamente l'utility dal suo unico figlio
+                    root_util = msg.value[0]
+
+            # Cerco dove l'utility è minima per l'agente ROOT
+            agent.value = np.argmin( np.array( root_util['rel'] ) )
+
+            for child in agent.c:
+                agent.sendMsg(child, msgType.VALUE, agent.value)
+
+            agent.debug("Inizio al time-step: {}".format(agent.value))
             return
 
         # Proseguo nel caso in cui l'agente non sia root

@@ -63,9 +63,13 @@ def start( agent ):
             if node is not agent.id:
                 agent.sendMsg(node, msgType.PTINFO, (parents[node], pseudo_parent[node], pseudotree[node], pseudo_children[node]) )
 
+
+        all_vars = agent.getVarsFromAllStartingPoints()
+
         # A tutti i miei sottoposti, sia reali sia pseudo, invio il mio dominio
         for child in agent.c + agent.pc:
             agent.sendMsg(child, msgType.DOMAIN, agent.domain)
+            agent.sendMsg(child, msgType.VARS, all_vars)
 
     else:
         """
@@ -85,9 +89,12 @@ def start( agent ):
         msg_ptinfo = agent.msgs[ key_msg_ptinfo ]
         agent.p, agent.pp, agent.c, agent.pc = msg_ptinfo.value
 
+        all_vars = agent.getVarsFromAllStartingPoints()
+
         # A tutti i miei sottoposti, sia reali sia pseudo, invio il mio dominio
         for child in agent.c + agent.pc:
             agent.sendMsg(child, msgType.DOMAIN, agent.domain)
+            agent.sendMsg(child, msgType.VARS, all_vars)
 
         # Aspetto che mi arrivi il dominio da tutti i miei parent e pseudo_parents
         while True:
@@ -99,11 +106,16 @@ def start( agent ):
                     all_parents_msgs_arrived = False
                     break
 
+                if ((int(parent), str(msgType.VARS))) not in agent.msgs:
+                    all_parents_msgs_arrived = False
+                    break
+
             if all_parents_msgs_arrived == True:
                 break
 
         # Assegno ad ogni nodo il suo dominio dopo che ho ricevuto il messaggio
         for parent in [agent.p] + agent.pp:
-            agent.otherAgents[parent].domain = agent.msgs[ (int(parent), str(msgType.DOMAIN)) ]
+            agent.otherAgents[parent].domain = agent.msgs[ (int(parent), str(msgType.DOMAIN)) ].value
+            agent.otherAgents[parent].varsFromStartingPoint = agent.msgs[(int(parent), str(msgType.VARS))].value
 
     agent.debug("End of pseudotree creation.")
