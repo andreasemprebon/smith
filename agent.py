@@ -17,6 +17,9 @@ class DiscoveredAgent:
         self.domain = None
         self.varsFromStartingPoint = None
 
+        self.isProducingPower      = False
+        self.otherAgentsInfluence  = {}
+
     def getVarsFromStartingPoint(self, x):
         if not self.varsFromStartingPoint:
             return {'status': False,
@@ -26,6 +29,27 @@ class DiscoveredAgent:
 
         return {'status'    : vars['status'],
                 'vars'      : np.array(vars['vars']) }
+
+    def getAvailPowerFromStartingPoint(self, x, other_agent):
+        if not self.varsFromStartingPoint:
+            return {'status': False,
+                    'vars'  : np.array([0] * consts.kTIME_SLOTS) }
+
+        vars = np.array( self.varsFromStartingPoint[x]['vars'] )
+
+        # Le mie variabili sono negative, in quanto immetto potenza nel sistema,
+        # sommo quindi le potenze degli altri agenti che ho già considerato.
+        # Se la somma è positiva, allora la metto a 0, altrimenti lascio il valore.
+        # In relations poi verrà aggiunto anche il contributo dell'agente considerato
+        for id in self.otherAgentsInfluence:
+            if id != other_agent:
+                a = self.otherAgentsInfluence[id]
+                vars = np.array(vars) + a.getVarsFromStartingPoint(x)['vars']
+
+        vars[np.where(vars > 0)] = 0
+
+        return {'status': True,
+                'vars'  : np.array(vars)}
 
 class Agent:
     def __init__(self, i, domain, port):
@@ -49,6 +73,7 @@ class Agent:
         self.isRoot             = True
         self.rootID             = 1
         self.value              = None
+        self.isProducingPower   = False
 
         self.p  = None  # The parent's id
         self.pp = None  # A list of the pseudo-parents' ids
@@ -156,8 +181,9 @@ class Agent:
         #
         # listening_socket.close()
 
-    def addNewDiscoveredAgent(self, id, addr, port):
+    def addNewDiscoveredAgent(self, id, addr, port, isProducingPower = False):
         discovered = DiscoveredAgent(id, addr, port)
+        discovered.isProducingPower = isProducingPower
         self.otherAgents[ id ] = discovered
 
     """

@@ -14,7 +14,7 @@ class WashingMachineCycle():
 
     COTTON_30 = {
                     'name' : 'Cotton 30',
-                    'power': [1, 1, 3, 8, 10, 3, 2]
+                    'power': [30, 30, 30, 8, 10, 3, 2]
                 }
 
 class WashingMachine(Agent):

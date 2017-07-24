@@ -9,7 +9,7 @@ def createAllRelationForAgent(agent):
         # Mi salvo la relazione con il padre, mi servirà dopo durante
         # la fase di VALUE propagation
         if agent2 == agent.p:
-            agent.relationWithParent = relations[-1]
+            agent.relationWithParent = relations[-1] #il -1 mi prende l'ultimo elemento aggiunto
 
     return relations
 
@@ -40,8 +40,18 @@ Più i valori sono bassi, meglio è
                 'cost'   : float costo totale della soluzione}
 """
 def valueOfAssignmentPerAgents(x1, x2, agent1, agent2):
-    assignment_agent1 = agent1.getVarsFromStartingPoint(x1)
-    assignment_agent2 = agent2.getVarsFromStartingPoint(x2)
+
+    if ( agent1.isProducingPower ):
+        agent1.otherAgentsInfluence[ agent2.id ] = agent2
+        assignment_agent1 = agent1.getAvailPowerFromStartingPoint(x1, agent2.id)
+    else:
+        assignment_agent1 = agent1.getVarsFromStartingPoint(x1)
+
+    if ( agent2.isProducingPower ):
+        agent2.otherAgentsInfluence[ agent1.id ] = agent1
+        assignment_agent2 = agent2.getAvailPowerFromStartingPoint(x2, agent1.id)
+    else:
+        assignment_agent2 = agent2.getVarsFromStartingPoint(x2)
 
     # Controllo che l'assegnazione sia valida per entrambi gli agenti
     if not assignment_agent1['status'] or not assignment_agent2['status']:
@@ -57,22 +67,14 @@ def valueOfAssignmentPerAgents(x1, x2, agent1, agent2):
             return { 'status' : False,
                      'cost'   : consts.kMAX_VALUE }
 
-    # Sottraggo l'energia prodotta dal pannello solare, se il pannello produce
-    # più di quanto viene consumato, allora il valore diventa 0
-    _tmp_solar_panel = [0] * consts.kTIME_SLOTS
-    _tmp_sp_power = [10, 0, 3, 4, 20, 7, 4, 3, 9, 12, 30]
-    _tmp_solar_panel[20:20+len(_tmp_sp_power)] = _tmp_sp_power
-
-    solar_panel = np.array( _tmp_solar_panel )
-
-    used_power_minus_sp = np.array( used_power - solar_panel )
-
-    # Se la potenza usata è negativa, metto 0
-    used_power_minus_sp[ np.where( used_power_minus_sp < 0) ] = 0
+    # Se la potenza usata è negativa, metto 0. Questo può accadere quando il pannello solare
+    # immette più energia di quella consumata nel sistema, in questo caso il suo contributo porterebbe
+    # a una potenza usata negativa
+    used_power[ np.where( used_power < 0) ] = 0
 
     # Calcolo il costo per ogni time-slot moltiplicando l'effettiva potenza utilizzata
     # per il costo di quel time-slot
-    total_cost_per_time_slot = np.multiply(used_power_minus_sp, cost.getCostsArray())
+    total_cost_per_time_slot = np.multiply(used_power, cost.getCostsArray())
 
     # Sommo il costo totale della mia soluzione, questo sarà il valore effettivo
     # della mia scelta

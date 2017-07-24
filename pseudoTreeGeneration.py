@@ -82,8 +82,13 @@ def start( agent ):
         # Attendo che la root mi restituisca le PTINFO
         key_msg_ptinfo = (int(agent.rootID), str(msgType.PTINFO))
 
+        count = 0
         while key_msg_ptinfo not in agent.msgs:
             time.sleep(0.5)
+            count += 1
+            if count > 5:
+                agent.sendMsg(agent.rootID, msgType.NEIGHBORS, agent.otherAgents)
+                count = 0
             pass
 
         msg_ptinfo = agent.msgs[ key_msg_ptinfo ]
