@@ -8,6 +8,7 @@ import UTILMessagePropagation
 import VALUEMessagePropagation
 import numpy as np
 import constants as consts
+import os
 
 class DiscoveredAgent:
     def __init__(self, id, addr, port):
@@ -17,10 +18,15 @@ class DiscoveredAgent:
         self.domain = None
         self.varsFromStartingPoint = None
 
+        self.optimizableAgent      = True
         self.isProducingPower      = False
         self.otherAgentsInfluence  = {}
 
     def getVarsFromStartingPoint(self, x):
+        if not self.optimizableAgent:
+            return {'status': True,
+                    'vars'  : np.array(self.cycle)}
+
         if not self.varsFromStartingPoint:
             return {'status': False,
                     'vars'  : np.array([0] * consts.kTIME_SLOTS) }
@@ -31,6 +37,10 @@ class DiscoveredAgent:
                 'vars'      : np.array(vars['vars']) }
 
     def getAvailPowerFromStartingPoint(self, x, other_agent):
+        if not self.optimizableAgent:
+            return {'status': True,
+                    'vars'  : np.array(self.cycle)}
+
         if not self.varsFromStartingPoint:
             return {'status': False,
                     'vars'  : np.array([0] * consts.kTIME_SLOTS) }
@@ -74,6 +84,7 @@ class Agent:
         self.rootID             = 1
         self.value              = None
         self.isProducingPower   = False
+        self.optimizableAgent   = True
 
         self.p  = None  # The parent's id
         self.pp = None  # A list of the pseudo-parents' ids
@@ -122,6 +133,11 @@ class Agent:
         raise NotImplementedError("Questo metodo deve essere implementato da ogni agente")
 
     """
+    """
+    def getAvailPowerFromStartingPoint(self, x, other_agent):
+        raise NotImplementedError("Questo metodo deve essere implementato da ogni agente che produce potenza")
+
+    """
     Prende tutti i possibili punti di inizio e crea un dict che li contiene. Questo dict
     sarà poi mandato a tutti gli altri agenti durante la creazione dello pseudoTree
     """
@@ -130,6 +146,11 @@ class Agent:
         for t in range(0, consts.kTIME_SLOTS):
             all_vars[t] = self.getVarsFromStartingPoint(t)
         return all_vars
+
+    """
+    """
+    def waitOptimizationEnd(self):
+        raise NotImplementedError("Questo metodo deve essere implementato da ogni agente che non può essere ottimizzato")
 
     """
     Se un nodo e' foglia, non ha figli, quindi vero se il numero di figli
@@ -181,9 +202,11 @@ class Agent:
         #
         # listening_socket.close()
 
-    def addNewDiscoveredAgent(self, id, addr, port, isProducingPower = False):
+    def addNewDiscoveredAgent(self, id, addr, port, isProducingPower = False, optimizableAgent = True):
         discovered = DiscoveredAgent(id, addr, port)
         discovered.isProducingPower = isProducingPower
+        discovered.optimizableAgent = optimizableAgent
+
         self.otherAgents[ id ] = discovered
 
     """
@@ -259,6 +282,27 @@ class Agent:
 
         # self.debug( self.msgs )
 
+    def computeFinalCycle(self):
+        # Calcolo il mio ciclo e lo invio sulla rete
+        start_timestep = self.value
+        cycle = self.getVarsFromStartingPoint(start_timestep)['vars']
+
+        # Salvo il file csv
+        self.saveFinalCycle(cycle)
+
+        # Invio sulla rete a tutti gli agenti il mio ciclo
+        for id in self.otherAgents:
+            a = self.otherAgents[id]
+            if not a.optimizableAgent:
+                self.sendMsg(id, message.MessageType.FINAL_CYCLE, cycle)
+
+    def saveFinalCycle(self, cycle):
+        dir = os.path.dirname(__file__)
+        output_folder = os.path.join(dir, "output")
+        filename_path = os.path.join(output_folder, '{}_{}_cycle.csv'.format(self.name, self.id))
+
+        np.savetxt(filename_path, np.array( cycle ), fmt='%i', delimiter=',')
+
     def debug(self, text):
         print("[{} {}]: {}".format(self.name, self.id, text))
 
@@ -287,3 +331,9 @@ class Agent:
         # dal loro genitore
         if not self.isRoot:
             VALUEMessagePropagation.start( self )
+
+        # Alla fine dell'intera procedura calcolo il mio ciclo finale
+        self.computeFinalCycle()
+
+        if not self.optimizableAgent:
+            self.waitOptimizationEnd()

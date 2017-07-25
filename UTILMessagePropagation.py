@@ -22,18 +22,24 @@ def start( agent ):
         # Invio tutte le relazioni al mio genitore
         agent.sendMsg(agent.p, msgType.UTIL, rels)
 
-        # @TODO: Aggiungere più agenti
+        # Invio informazioni al padre su tutti gli agenti che producono energia
+        producing_energy_msg = {}
         for id in agent.otherAgents:
             a = agent.otherAgents[id]
             if a.isProducingPower:
-                print([ a.otherAgentsInfluence[ag_id].id for ag_id in a.otherAgentsInfluence ])
-                agent.sendMsg(agent.p, msgType.SP_CONSIDERED_AGENT, [ a.otherAgentsInfluence[ag_id].id for ag_id in a.otherAgentsInfluence ])
+                # print([ a.otherAgentsInfluence[ag_id].id for ag_id in a.otherAgentsInfluence ])
+                producing_energy_msg[a.id] = [a.otherAgentsInfluence[ag_id].id for ag_id in a.otherAgentsInfluence]
 
+        if len(producing_energy_msg) > 0:
+            agent.sendMsg(agent.p, msgType.PROD_ENERGY_CONSIDERED_AGENT, producing_energy_msg)
+
+        # Nel caso in cui sia io l'agente che produce energia, invio le mie informazioni
+        producing_energy_msg = {}
         if agent.isProducingPower:
-            print([agent.otherAgentsInfluence[ag_id].id for ag_id in agent.otherAgentsInfluence])
-            agent.debug("Produco quindi mando")
-            agent.sendMsg(agent.p, msgType.SP_CONSIDERED_AGENT,
-                          [agent.otherAgentsInfluence[ag_id].id for ag_id in agent.otherAgentsInfluence])
+            # print([agent.otherAgentsInfluence[ag_id].id for ag_id in agent.otherAgentsInfluence])
+            # agent.debug("Produco quindi mando")
+            producing_energy_msg[agent.id] = [agent.otherAgentsInfluence[ag_id].id for ag_id in agent.otherAgentsInfluence]
+            agent.sendMsg(agent.p, msgType.PROD_ENERGY_CONSIDERED_AGENT, producing_energy_msg)
 
     else:
         #agent.debug("Non foglia")
@@ -52,14 +58,13 @@ def start( agent ):
 
         # Attendo che i messaggi con gli agenti già considerati per tutti gli agenti
         # che producono potenza
-        # @TODO: Aggiungere più agenti
         while True:
             all_children_msgs_arrived = True
             time.sleep(0.5)
-            agent.debug("Attendo chi produce")
-            agent.debug(agent.msgs)
+            agent.debug("Attendo informazioni su chi produce")
+            #agent.debug(agent.msgs)
             for id in agent.c:
-                if ((int(id), str(msgType.SP_CONSIDERED_AGENT))) not in agent.msgs:
+                if ((int(id), str(msgType.PROD_ENERGY_CONSIDERED_AGENT))) not in agent.msgs:
                     all_children_msgs_arrived = False
                     break
             if all_children_msgs_arrived == True:
@@ -69,15 +74,19 @@ def start( agent ):
             #sender_id   = msg_key[0]
             msg_type    = msg_key[1]
             msg         = agent.msgs[ msg_key ]
-            if msg_type == msgType.SP_CONSIDERED_AGENT:
+            if msg_type == msgType.PROD_ENERGY_CONSIDERED_AGENT:
+                # Salvo la lista inviata
+                producing_energy_msg_value = msg.value
+
+                # Per ogni agente controllo se produce potenza, nel caso, se il suo id è nella lista,
+                # prendo gli agenti che ha già considerato
                 for id in agent.otherAgents:
                     a = agent.otherAgents[id]
                     if a.isProducingPower:
-                        for id in msg.value:
-                            agent.debug(msg.value)
-                            if id in agent.otherAgents:
-                                a.otherAgentsInfluence[id] = agent.otherAgents[id]
-                        break  # @TODO: Aggiungere più agenti
+                        if a.id in producing_energy_msg_value:
+                            for id in producing_energy_msg_value[a.id]:
+                                if id in agent.otherAgents:
+                                    a.otherAgentsInfluence[id] = agent.otherAgents[id]
 
         if agent.isRoot:
             root_util = None
@@ -136,18 +145,25 @@ def start( agent ):
 
         agent.sendMsg(agent.p, msgType.UTIL, rels)
 
-        # @TODO: Aggiungere più agenti
+        # Invio informazioni al padre su tutti gli agenti che producono energia
+        producing_energy_msg = {}
         for id in agent.otherAgents:
             a = agent.otherAgents[id]
             if a.isProducingPower:
-                print([a.otherAgentsInfluence[ag_id].id for ag_id in a.otherAgentsInfluence])
-                agent.sendMsg(agent.p, msgType.SP_CONSIDERED_AGENT,
-                              [a.otherAgentsInfluence[ag_id].id for ag_id in a.otherAgentsInfluence])
+                # print([ a.otherAgentsInfluence[ag_id].id for ag_id in a.otherAgentsInfluence ])
+                producing_energy_msg[a.id] = [a.otherAgentsInfluence[ag_id].id for ag_id in a.otherAgentsInfluence]
 
+        if len(producing_energy_msg) > 0:
+            agent.sendMsg(agent.p, msgType.PROD_ENERGY_CONSIDERED_AGENT, producing_energy_msg)
+
+        # Nel caso in cui sia io l'agente che produce energia, invio le mie informazioni
+        producing_energy_msg = {}
         if agent.isProducingPower:
-            agent.debug("Produco quindi mando")
-            agent.sendMsg(agent.p, msgType.SP_CONSIDERED_AGENT,
-                          [agent.otherAgentsInfluence[ag_id].id for ag_id in agent.otherAgentsInfluence])
+            # print([agent.otherAgentsInfluence[ag_id].id for ag_id in agent.otherAgentsInfluence])
+            # agent.debug("Produco quindi mando")
+            producing_energy_msg[agent.id] = [agent.otherAgentsInfluence[ag_id].id for ag_id in
+                                              agent.otherAgentsInfluence]
+            agent.sendMsg(agent.p, msgType.PROD_ENERGY_CONSIDERED_AGENT, producing_energy_msg)
 
 def projectionOfAgentOnRelation(id, rel):
 

@@ -5,7 +5,8 @@ class MessageType():
     VARS        = 'vars'        # Contiene tutti i possibili assegnamenti delle varibaili per ogni starting point
     UTIL        = 'util'        # E' il messaggio di UTIL inviato dai figli ai loro genitori e pseudo genitori
     VALUE       = 'value'       # E' il messaggio che contiene il valore assegnato alla variabile controllata
-    SP_CONSIDERED_AGENT = 'sp_considered_agent' # ID degli agenti già considerati nel pannello solare
+    PROD_ENERGY_CONSIDERED_AGENT = 'prod_energy_considered_agent' # ID degli agenti già considerati nel pannello solare
+    FINAL_CYCLE = 'final_cycle'
 
 class Message():
     def __init__(self, type, sender, value):
