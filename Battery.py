@@ -11,14 +11,14 @@ class Battery(Agent):
 
         self.cycle = np.zeros( consts.kTIME_SLOTS )
 
-        self.max_capacity   = 2000
-        self.charge         = 1500
+        self.max_capacity   = 2000 #Wh
+        self.charge         = 1500 #Wh
 
-        self.maxIstantaneousPower = 100
-        self.maxRechargeIstantaneousPower = 100
+        # Potenza massima di carica/scarica
+        self.max_power      = 2000 #Wh
 
-        self.chargeCycle    = np.zeros( consts.kTIME_SLOTS )
-        self.dischargeCycle = np.zeros( consts.kTIME_SLOTS )
+        self.maxDischargeIstantaneous   = self.max_power * consts.kHOUR_TO_TIMESLOT_RELATION
+        self.maxRechargeIstantaneous    = self.max_power * consts.kHOUR_TO_TIMESLOT_RELATION
 
         self.optimizableAgent = False
 
@@ -97,8 +97,10 @@ class Battery(Agent):
             avail_power[t]  = max(0, abs(solar_panel_cycle[t]) - current_cycle)
 
             if current_cycle > 0:
-                finale_cycle[t] = -1 * self.getPowerFromConsumption(current_cycle)
+                finale_cycle[t] = -1 * self.getPowerFromConsumption( current_cycle )
             else:
                 finale_cycle[t] = self.getPowerFromRecharge( avail_power[t] )
+
+            self.charge = self.charge + (finale_cycle[t] * consts.kHOUR_TO_TIMESLOT_RELATION)
 
         self.saveFinalCycle( finale_cycle )

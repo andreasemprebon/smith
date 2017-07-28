@@ -1,5 +1,7 @@
 kTIME_SLOTS = 96
 
+kHOUR_TO_TIMESLOT_RELATION = 0.25
+
 kMAX_POWER = 30
 
 kMAX_VALUE = float("+inf")
