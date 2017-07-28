@@ -3,12 +3,14 @@ import constants as consts
 import numpy as np
 
 class Boiler(Agent):
-    def __init__(self, id, addr, port, qty):
+    def __init__(self, id, addr, port, qty = 0):
         super().__init__(id, addr, port)
         self.name               = "Boiler"
         self.timeToEndBefore    = None
+        self.timeToStartAfter   = None
         self.min_qty = 0
         self.max_qty = 100
+        self.target_qty = 0
         self.setQty(qty)
 
         # Consuma 10 quando è acceso
@@ -29,7 +31,7 @@ class Boiler(Agent):
             return np.floor((target_qty - self.qty) / 5).astype(int)
 
     def getCycle(self):
-        duration = self.getTimeToReachQty(self.max_qty)
+        duration = self.getTimeToReachQty( min(self.target_qty, self.max_qty) )
         return [self.power_when_on] * duration
 
     def getVarsFromStartingPoint(self, x):
@@ -48,6 +50,12 @@ class Boiler(Agent):
                 return {'status': False,
                         'vars'  : np.array(vars)}
 
+        # Constraint sul iniziare dopo un certo timestep
+        if self.timeToStartAfter:
+            if (x < self.timeToStartAfter):
+                return {'status': False,
+                        'vars'  : np.array(vars)}
+
         vars[x:cycle_length+x] = cycle
 
         return {    'status'    : True,
@@ -58,5 +66,16 @@ class Boiler(Agent):
             return False
         self.timeToEndBefore = time
 
+    def startAfter(self, time):
+        if (time >= consts.kTIME_SLOTS):
+            return False
+        if (time <= 0):
+            return False
+
+        self.timeToStartAfter = time
+
     def removeTimeToEndBefore(self):
         self.timeToEndBefore = None
+
+    def removeTimeToStartAfter(self):
+        self.timeToStartAfter = None

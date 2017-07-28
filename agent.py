@@ -25,7 +25,7 @@ class DiscoveredAgent:
     def getVarsFromStartingPoint(self, x):
         if not self.optimizableAgent:
             return {'status': True,
-                    'vars'  : np.array(self.cycle)}
+                    'vars'  : np.zeros( consts.kTIME_SLOTS )}
 
         if not self.varsFromStartingPoint:
             return {'status': False,
@@ -39,7 +39,7 @@ class DiscoveredAgent:
     def getAvailPowerFromStartingPoint(self, x, other_agent):
         if not self.optimizableAgent:
             return {'status': True,
-                    'vars'  : np.array(self.cycle)}
+                    'vars'  : np.zeros( consts.kTIME_SLOTS )}
 
         if not self.varsFromStartingPoint:
             return {'status': False,

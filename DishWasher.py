@@ -2,24 +2,24 @@ from agent import Agent
 import constants as consts
 import numpy as np
 
-class WashingMachineCycle():
-    COTTON_60 = {
-                    'name'  : 'Cotton 60',
-                    'power' : [10, 15, 20, 8, 5]
-                }
+class DishWasherCycle():
+    ECO = {
+            'name'  : 'Eco',
+            'power' : [10, 15, 20, 8, 5]
+            }
 
-    COTTON_30 = {
-                    'name' : 'Cotton 30',
+    VERY_DIRTY = {
+                    'name' : 'Very Dirty',
                     'power': [30, 30, 30, 8, 10, 3, 2]
                 }
 
-class WashingMachine(Agent):
+class DishWasher(Agent):
     def __init__(self, id, addr, port):
         super().__init__(id, addr, port)
-        self.name               = "WashingMachine"
+        self.name               = "DishWasher"
         self.timeToEndBefore    = None
         self.timeToStartAfter   = None
-        self.cycle              = WashingMachineCycle.COTTON_60
+        self.cycle              = DishWasherCycle.ECO
 
     def getCycle(self):
         return self.cycle['power']

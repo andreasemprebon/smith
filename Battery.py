@@ -15,7 +15,7 @@ class Battery(Agent):
         self.charge         = 1500 #Wh
 
         # Potenza massima di carica/scarica
-        self.max_power      = 2000 #Wh
+        self.max_power      = 2000 #W
 
         self.maxDischargeIstantaneous   = self.max_power * consts.kHOUR_TO_TIMESLOT_RELATION
         self.maxRechargeIstantaneous    = self.max_power * consts.kHOUR_TO_TIMESLOT_RELATION
@@ -43,7 +43,7 @@ class Battery(Agent):
         if self.charge <= 0:
             return 0
 
-        return min(self.charge, min(c, self.maxIstantaneousPower))
+        return min(self.charge, min(c, self.maxDischargeIstantaneous))
 
     def getPowerFromRecharge(self, sp):
         if self.charge >= self.max_capacity:
@@ -51,7 +51,7 @@ class Battery(Agent):
 
         delta = self.max_capacity - self.charge
 
-        return min(sp, min(self.maxRechargeIstantaneousPower, delta))
+        return min(sp, min(self.maxRechargeIstantaneous, delta))
 
     # Sono un agente non ottimizzabile, attendo la fine della procedura di ottimizzazione per
     # determinare il mio ciclo con carica e scarica.

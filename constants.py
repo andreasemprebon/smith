@@ -1,8 +1,10 @@
+import numpy as np
+
 kTIME_SLOTS = 96
 
 kHOUR_TO_TIMESLOT_RELATION = 0.25
 
-kMAX_POWER = 30
+kMAX_POWER = 3000
 
-kMAX_VALUE = float("+inf")
-kMIN_VALUE = float("-inf")
+kMAX_VALUE = np.inf
+kMIN_VALUE = -kMAX_VALUE

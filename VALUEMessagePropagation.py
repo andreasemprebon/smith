@@ -1,5 +1,6 @@
 import time
 import numpy as np
+import constants as consts
 from message import MessageType as msgType
 
 def start(agent):
@@ -21,6 +22,8 @@ def start(agent):
 
     rel = agent.relationWithParent['rel']
 
+    parent_selected_column = rel[:,parent_value]
+
     # Cerco dove è il minimo lungo le colonne. Il mio valore sarà il valore corrispondente
     # alla casella di quello selezionato dal padre.
     # Esempio: parent_value = 2
@@ -31,8 +34,31 @@ def start(agent):
     # Il mio valore è quello in posizione 2 (parent_value) dell'array
     # che corrisponde al valore 6 della matrice
 
-    agent_col = np.argmin(rel, axis = 1)
-    agent.value = agent_col[ parent_value ]
+    # Controllo che con i vincoli imposti si possa fare
+    # #agent_col = np.argmin(rel, axis=1)
+    #
+    # mask_inf = np.isinf( agent_col )
+    # sum_inf = np.sum( mask_inf )
+    # agent.debug(rel)
+    # agent.debug(agent_col)
+    # agent.debug(sum_inf)
+
+    # if sum_inf == len(rel):
+    #     agent.debug("[ERRORE] Impossibile rispettare i vincoli")
+    #     agent.value = 0
+    # else:
+    #     agent.value = agent_col[ parent_value ]
+
+    sum_inf = 0
+    for e in parent_selected_column:
+        if e == consts.kMAX_VALUE:
+            sum_inf += 1
+    #agent.debug(parent_selected_column)
+    if sum_inf == len(parent_selected_column):
+        agent.debug("[ERRORE] Impossibile rispettare i vincoli")
+        agent.value = 0
+    else:
+        agent.value = np.argmin(parent_selected_column)
 
     for child in agent.c:
         agent.sendMsg(child, msgType.VALUE, agent.value)

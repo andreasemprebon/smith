@@ -70,6 +70,15 @@ def start( agent ):
             if all_children_msgs_arrived == True:
                 break
 
+            no_one_produces_power = True
+            for id in agent.otherAgents:
+                a = agent.otherAgents[id]
+                if a.isProducingPower:
+                    no_one_produces_power = False
+            if no_one_produces_power == True:
+                break
+
+
         for msg_key in agent.msgs:
             #sender_id   = msg_key[0]
             msg_type    = msg_key[1]
