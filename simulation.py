@@ -1,7 +1,9 @@
 import os
 import sys
 import json
-from shutil import move
+from shutil import move, rmtree
+import numpy as np
+import constants as const
 
 """
 COSTO
@@ -71,6 +73,8 @@ scenario_output_folder  = os.path.join(output_folder, nome_scenario)
 try:
     os.mkdir(scenario_output_folder)
 except FileExistsError:
+    rmtree(scenario_output_folder, ignore_errors = True)
+    os.mkdir(scenario_output_folder)
     pass
 
 for the_file in os.listdir(output_folder):
@@ -227,5 +231,18 @@ for day, desc in enumerate( data['days'] ):
         if os.path.isfile(file_path):
             new_path = os.path.join(day_output_folder, the_file)
             move(file_path, new_path)
+
+    day_merged_output = os.path.join(day_output_folder, "merged_output.csv")
+
+    final_output_dict = {}
+    for the_file in os.listdir(day_output_folder):
+        file_path = os.path.join(day_output_folder, the_file)
+        if os.path.isfile(file_path):
+            ar = np.genfromtxt(file_path)
+            nome_file = os.path.splitext(the_file)[0]
+            final_output_dict[nome_file] = ar
+
+    out_array = np.column_stack( list( final_output_dict.values() ))
+    np.savetxt(day_merged_output, out_array, fmt='%i', delimiter=',', header=",".join(final_output_dict.keys()), comments=" ")
 
 printTitle( "Fine simulazione {}".format(nome_scenario) )
