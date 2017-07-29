@@ -324,7 +324,7 @@ class Agent:
     def start(self):
         if len( self.otherAgents ) == 0:
             self.debug("Sono l'unico agente sulla rete, non posso ottimizzare nulla.")
-            return
+            return False
 
         self.listenToMessagesThread = threading.Thread(name='ListenToMessages-Thread-of-Agent-' + str(self.id),
                                                        target=self.listenToMessages
@@ -356,3 +356,5 @@ class Agent:
 
         if not self.optimizableAgent:
             self.waitOptimizationEnd()
+
+        return True

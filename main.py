@@ -62,8 +62,7 @@ elif hostname == kRaspberryPI_2:
 
 # Se ho un agente impostato, ogni 5 secondi avvio una ottimizzazione
 if agent:
-    while (True):
-        agent.start()
+    while (not agent.start()):
         time.sleep(5.0)
 else:
     print("Nessun agente impostato. Esco.")
