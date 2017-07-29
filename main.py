@@ -2,6 +2,7 @@ import os
 import socket
 import random
 import time
+import cost
 
 """
 WASHING MACHINE
@@ -23,6 +24,12 @@ from SolarPanel import SolarPanel
 BATTERY
 """
 from Battery import Battery
+
+"""
+COST
+"""
+cost_filename = "20170725MGPPrezzi.xml"
+cost.readCostFromFile( cost_filename )
 
 """
 Nomi Raspberry PI
