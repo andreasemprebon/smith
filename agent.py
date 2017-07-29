@@ -66,11 +66,11 @@ class Agent:
         # Informazioni per la comunicazione
 
         # Broadcast
-        self.broadcast_addr = "127.0.0.1"
-        self.broadcast_port = 12345
+        self.broadcast_addr = "255.255.255.255"
+        self.broadcast_port = 5555
 
         # DPOP
-        self.host = "127.0.0.1"
+        self.host = socket.gethostbyname( socket.getfqdn() )
         self.port = port
 
         # Variabili Agente
@@ -81,7 +81,7 @@ class Agent:
         self.relationWithParent = {}
         self.otherAgents        = {}
         self.isRoot             = True
-        self.rootID             = 1
+        self.rootID             = self.id
         self.value              = None
         self.isProducingPower   = False
         self.optimizableAgent   = True
@@ -95,24 +95,21 @@ class Agent:
 
 
         # Inizia ad annunciarti e ad ascoltare annunci sulla rete
-        # self.annouceThread = threading.Thread(  name    = 'Announcing-Thread-of-Agent-' + str( self.id ),
-        #                                         target  = self.announceMyselfInTheNetwork,
-        #                                         kwargs  = { 'myself' : self }
-        #                                         )
-        #
-        # self.readAnnouncementThread = threading.Thread( name    = 'Read-Announcement-Thread-of-Agent-' + str(self.id),
-        #                                                 target  = self.getOtherAgentsAnnouncement,
-        #                                                 kwargs  = { 'myself': self }
-        #                                                 )
+        self.annouceThread = threading.Thread(  name    = 'Announcing-Thread-of-Agent-' + str( self.id ),
+                                                target  = self.announceMyselfInTheNetwork,
+                                                kwargs  = { 'myself' : self }
+                                                )
 
-        # self.annouceThread.setDaemon(True)
-        # self.readAnnouncementThread.setDaemon(True)
+        self.readAnnouncementThread = threading.Thread( name    = 'Read-Announcement-Thread-of-Agent-' + str(self.id),
+                                                        target  = self.getOtherAgentsAnnouncement,
+                                                        kwargs  = { 'myself': self }
+                                                        )
 
+        self.annouceThread.setDaemon(True)
+        self.readAnnouncementThread.setDaemon(True)
 
-        # Non si puo' fare sulla stessa macchina perche' non posso aprire piu' socket sulla stessa porta, ma in generale
-        # quando l'intero sistema sara' distribuito funzionera'
-        #self.annouceThread.start()
-        #self.readAnnouncementThread.start()
+        self.annouceThread.start()
+        self.readAnnouncementThread.start()
 
         # Inizio ad ascoltare i messaggi in arrivo sulla mia porta
 
@@ -164,43 +161,55 @@ class Agent:
 
     """
     Invia periodicamente un messaggio in broadcast sulla rete in modo da annunciare la sua presenza
-    Il messaggio contiene il proprio indirizzo IP e la porta utilizzata per ricevere i messaggi di DPOP
+    Il messaggio contiene il proprio indirizzo IP, la porta utilizzata per ricevere i messaggi di DPOP,
+    se l'agente produce energia e se è ottimizzabile:
+        (id, host, port, isProducingPower, optimizableAgent)
     """
     def announceMyselfInTheNetwork(self, myself):
-        raise NotImplementedError
-        # pdata = pickle.dumps((myself.id, myself.host, myself.port))
-        # sock  = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #
-        # while (True):
-        #     #print("Annuncio Agente {}".format(myself.id))
-        #     sock.sendto(pdata, (myself.broadcast_addr, myself.broadcast_port) )
-        #     time.sleep(5)
-        #
-        # sock.close()
+        pdata = pickle.dumps((myself.id, myself.host, myself.port, myself.isProducingPower, myself.optimizableAgent))
+        sock  = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        while (True):
+            print("Annuncio Agente {} - {}".format(myself.id, myself.host))
+            sock.sendto(pdata, (myself.broadcast_addr, myself.broadcast_port) )
+            time.sleep(5)
+
+        sock.close()
 
     # @TODO: Funzione da terminare, quando sara' effettivamete tutto distribuito
     def getOtherAgentsAnnouncement(self, myself):
-        raise NotImplementedError
-        # listening_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        #
-        # listening_socket.bind( (myself.host, myself.broadcast_port) )
-        #
-        # while (True):
-        #     data, addr = listening_socket.recvfrom(65536)
-        #     udata = pickle.loads(data)
-        #     print(udata)
-        #
-        #     agent_id    = udata[0]
-        #     agent_addr  = udata[1]
-        #     agent_port  = udata[2]
-        #
-        #     if agent_id != myself.id:
-        #         if agent_id not in myself.otherAgents:
-        #             self.addNewDiscoveredAgent(agent_id, agent_addr, agent_port)
-        #
-        # listening_socket.close()
+        listening_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+
+        listening_socket.bind( (myself.host, myself.broadcast_port) )
+
+        while (True):
+            data, addr = listening_socket.recvfrom(65536)
+            udata = pickle.loads(data)
+            print(udata)
+
+            agent_id            = udata[0]
+            agent_addr          = udata[1]
+            agent_port          = udata[2]
+            agent_prod_power    = udata[3]
+            agent_optimizable   = udata[4]
+
+            if agent_id != myself.id:
+                if agent_id not in myself.otherAgents:
+                    # Se trovo un agente con ID minore del mio, sicuramente io non sono root
+                    if agent_id < myself.id:
+                        myself.rootID = False
+
+                    # Imposto il valore del rootID come il minore fra tutti gli agenti considerati
+                    self.rootID = min(self.rootID, agent_id)
+
+                    # Aggiungo il nuovo agente
+                    self.addNewDiscoveredAgent(agent_id, agent_addr, agent_port,
+                                               isProducingPower = agent_prod_power,
+                                               optimizableAgent = agent_optimizable)
+
+        listening_socket.close()
 
     def addNewDiscoveredAgent(self, id, addr, port, isProducingPower = False, optimizableAgent = True):
         discovered = DiscoveredAgent(id, addr, port)
@@ -208,12 +217,6 @@ class Agent:
         discovered.optimizableAgent = optimizableAgent
 
         self.otherAgents[ id ] = discovered
-
-    """
-    Calcola il valore dell'utility secondo i bindings correnti
-    """
-    def computeUtil(self):
-        raise NotImplementedError
 
     """
     Invia i messaggi tramite il protocollo UDP:
@@ -240,6 +243,9 @@ class Agent:
             sock.close()
 
     def listenToMessages(self):
+        if self.isListening:
+            return True
+
         listening_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         #listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
@@ -273,9 +279,9 @@ class Agent:
 
         udata = pickle.loads(data)
 
-        msg_sender = udata[0]
-        msg_type = udata[1]
-        msg_value = udata[2]
+        msg_sender  = udata[0]
+        msg_type    = udata[1]
+        msg_value   = udata[2]
 
         # self.debug("[RICEZIONE] ({}, {}): {}".format(int(msg_sender), str(msg_type), msg_value))
         self.msgs[(int(msg_sender), str(msg_type))] = message.Message(msg_type, msg_sender, msg_value)
@@ -307,6 +313,10 @@ class Agent:
         print("[{} {}]: {}".format(self.name, self.id, text))
 
     def start(self):
+        if len( self.otherAgents ) == 0:
+            self.debug("Sono l'unico agente sulla rete, non posso ottimizzare nulla.")
+            return
+
         self.listenToMessagesThread = threading.Thread(name='ListenToMessages-Thread-of-Agent-' + str(self.id),
                                                        target=self.listenToMessages
                                                        )
