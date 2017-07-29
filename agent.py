@@ -70,7 +70,7 @@ class Agent:
         self.broadcast_port = 5555
 
         # DPOP
-        self.host = socket.gethostbyname( socket.getfqdn() )
+        self.host = self.getIPAddress()
         self.port = port
 
         # Variabili Agente
@@ -112,6 +112,11 @@ class Agent:
         self.readAnnouncementThread.start()
 
         # Inizio ad ascoltare i messaggi in arrivo sulla mia porta
+
+    def getIPAddress(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
 
     """
     Ritorna una lista contente il ciclo che questo agente
@@ -181,9 +186,10 @@ class Agent:
     def getOtherAgentsAnnouncement(self, myself):
         listening_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        #listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
-        listening_socket.bind( (myself.host, myself.broadcast_port) )
+        listening_socket.bind( ('', myself.broadcast_port) )
 
         while (True):
             data, addr = listening_socket.recvfrom(65536)
@@ -195,6 +201,8 @@ class Agent:
             agent_port          = udata[2]
             agent_prod_power    = udata[3]
             agent_optimizable   = udata[4]
+
+            myself.debug("Ricevuti dati da: {} - {}".format(agent_id, agent_addr))
 
             if agent_id != myself.id:
                 if agent_id not in myself.otherAgents:
