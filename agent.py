@@ -168,6 +168,7 @@ class Agent:
     def announceMyselfInTheNetwork(self, myself):
         pdata = pickle.dumps((myself.id, myself.host, myself.port, myself.isProducingPower, myself.optimizableAgent))
         sock  = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
         while (True):
             print("Annuncio Agente {} - {}".format(myself.id, myself.host))
