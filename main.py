@@ -11,6 +11,12 @@ from WashingMachine import WashingMachine
 from WashingMachine import WashingMachineCycle
 
 """
+DISH WASHER
+"""
+from DishWasher import DishWasher
+from DishWasher import DishWasherCycle
+
+"""
 BOILER
 """
 from Boiler import Boiler
@@ -36,6 +42,9 @@ Nomi Raspberry PI
 """
 kRaspberryPI_1 = 'raspberrypi1'
 kRaspberryPI_2 = 'raspberrypi2'
+kRaspberryPI_3 = 'raspberrypi3'
+kRaspberryPI_4 = 'raspberrypi4'
+kRaspberryPI_5 = 'raspberrypi5'
 
 hostname = socket.gethostname()
 
@@ -60,9 +69,25 @@ elif hostname == kRaspberryPI_2:
     agent.target_qty = 90
     agent.setQty(50)
 
+elif hostname == kRaspberryPI_3:
+    agent_id    = 3
+    agent       = DishWasher(agent_id, range(0, 96), 12345)
+
+    # La lavastoviglie inizia dopo il time step 30
+    agent.startAfter( 30 )
+
+elif hostname == kRaspberryPI_4:
+    agent_id    = 4
+    agent       = SolarPanel(agent_id, range(0, 96), 12345)
+
+elif hostname == kRaspberryPI_5:
+    agent_id    = 5
+    agent       = Battery(agent_id, range(0, 96), 12345)
+
 # Se ho un agente impostato, ogni 5 secondi avvio una ottimizzazione
 if agent:
-    while (not agent.start()):
+    while (True):
+        agent.start()
         time.sleep(5.0)
 else:
     print("Nessun agente impostato. Esco.")
