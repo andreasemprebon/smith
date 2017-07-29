@@ -176,7 +176,7 @@ class Agent:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
         while (True):
-            print("Annuncio Agente {} - {}".format(myself.id, myself.host))
+            myself.debug("Annuncio agente {} - {}".format(myself.id, myself.host))
             sock.sendto(pdata, (myself.broadcast_addr, myself.broadcast_port) )
             time.sleep(5)
 
@@ -194,7 +194,7 @@ class Agent:
         while (True):
             data, addr = listening_socket.recvfrom(65536)
             udata = pickle.loads(data)
-            print(udata)
+            #print(udata)
 
             agent_id            = udata[0]
             agent_addr          = udata[1]
@@ -202,13 +202,13 @@ class Agent:
             agent_prod_power    = udata[3]
             agent_optimizable   = udata[4]
 
-            myself.debug("Ricevuti dati da: {} - {}".format(agent_id, agent_addr))
-
             if agent_id != myself.id:
                 if agent_id not in myself.otherAgents:
+                    myself.debug("Ricevuti dati da: {} - {}".format(agent_id, agent_addr))
+
                     # Se trovo un agente con ID minore del mio, sicuramente io non sono root
                     if agent_id < myself.id:
-                        myself.rootID = False
+                        myself.isRoot = False
 
                     # Imposto il valore del rootID come il minore fra tutti gli agenti considerati
                     self.rootID = min(self.rootID, agent_id)
