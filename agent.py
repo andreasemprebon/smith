@@ -189,7 +189,7 @@ class Agent:
         listening_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        #listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         listening_socket.bind( ('', myself.broadcast_port) )
 
