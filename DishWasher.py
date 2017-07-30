@@ -4,18 +4,18 @@ import numpy as np
 
 class DishWasherCycle():
     ECO = {
-            'name'  : 'Eco',
-            'power' : [10, 15, 20, 8, 5]
-            }
+        'name' : 'Eco',
+        'power': [10, 10, 100, 1830, 90, 90, 90, 100, 1790, 1790]
+    }
 
     VERY_DIRTY = {
-                    'name' : 'Very Dirty',
-                    'power': [30, 30, 30, 8, 10, 3, 2]
-                }
+        'name' : 'Very Dirty',
+        'power': [1840, 1830, 1840, 1850, 1830, 1850, 1860]
+    }
 
 class DishWasher(Agent):
-    def __init__(self, id, addr, port):
-        super().__init__(id, addr, port)
+    def __init__(self, id, addr, port, simulation = False):
+        super().__init__(id, addr, port, simulation)
         self.name               = "DishWasher"
         self.timeToEndBefore    = None
         self.timeToStartAfter   = None

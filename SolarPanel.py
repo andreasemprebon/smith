@@ -1,23 +1,39 @@
 from agent import Agent
 import constants as consts
 import numpy as np
+import os
 
-"""
-@TODO Dati radiazione
-"""
+class SolarPanelRadiation():
+    LOW     = "low.csv"
+    MEDIUM  = "medium.csv"
+    HIGH    = "high.csv"
 
 class SolarPanel(Agent):
-    def __init__(self, id, addr, port):
-        super().__init__(id, addr, port)
+    def __init__(self, id, addr, port, simulation = False):
+        super().__init__(id, addr, port, simulation)
         self.name = "SolarPanel"
 
-        self.cycle = np.array( [-7, -2, -6, -8, -8, -8, -1, -8, -7, -1, -2, -1, -7, -4, -7, -1, -30, -3, -8, -1, -6, -4, -4, -6, -4, -2, 0, -6, -6, -4, -6, 0, -5, 0, -5, 0, 0, -5, -3, -3, -7, -3, -3, -5, -3, -2, -1, -6, -7, -2, -6, -2, -6, -6, -3, -5, -8, -5, -1, -2, -3, -7, -5, -3, -3, -4, -7, -5, -7, -5, 0, -7, -7, -3, -8, -7, -2, -8, -6, -1, 0, -2, -4, -4, -7, 0, -3, -2, -8, -7, -5, -2, -5, -2, -8, -1])
+        self.radiation_type = SolarPanelRadiation.MEDIUM
 
-        if ( len(self.cycle) != consts.kTIME_SLOTS ):
-            raise ValueError("Il vettore con la produzione del pannello solare non è della lunghezza corretta.")
+        self.readRadiation()
 
         self.isProducingPower       = True
         self.otherAgentsInfluence   = {}
+
+    def setRadiation(self, rad_type):
+        self.radiation_type = rad_type
+        self.readRadiation()
+
+    def readRadiation(self):
+        dir                             = os.path.dirname(__file__)
+        solar_panel_radiation_folder    = os.path.join(dir, "solar_panel_radiation")
+        file_path                       = os.path.join(solar_panel_radiation_folder, self.radiation_type)
+
+        cycle       = np.genfromtxt(file_path)
+        self.cycle  = np.array(cycle)
+
+        if (len(self.cycle) != consts.kTIME_SLOTS):
+            raise ValueError("Il vettore con la produzione del pannello solare non è della lunghezza corretta.")
 
     def getCycle(self):
         return self.cycle

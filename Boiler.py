@@ -3,8 +3,8 @@ import constants as consts
 import numpy as np
 
 class Boiler(Agent):
-    def __init__(self, id, addr, port, qty = 0):
-        super().__init__(id, addr, port)
+    def __init__(self, id, addr, port, qty = 0, simulation = False):
+        super().__init__(id, addr, port, simulation)
         self.name               = "Boiler"
         self.timeToEndBefore    = None
         self.timeToStartAfter   = None
@@ -13,8 +13,9 @@ class Boiler(Agent):
         self.target_qty = 0
         self.setQty(qty)
 
-        # Consuma 10 quando è acceso
-        self.power_when_on = 10
+        # Fonte dati: Edison - media consumi ciclo WaterHeater 16 Giugno
+        # Consuma 1150 quando è acceso
+        self.power_when_on = 1150  # W
 
     # Imposta la quantità di acqua calda presente nel boiler
     def setQty(self, val):

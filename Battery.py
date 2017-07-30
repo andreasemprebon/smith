@@ -5,8 +5,8 @@ from message import MessageType as msgType
 import time
 
 class Battery(Agent):
-    def __init__(self, id, addr, port):
-        super().__init__(id, addr, port)
+    def __init__(self, id, addr, port, simulation = False):
+        super().__init__(id, addr, port, simulation)
         self.name = "Battery"
 
         self.cycle = np.zeros( consts.kTIME_SLOTS )

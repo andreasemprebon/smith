@@ -62,7 +62,7 @@ class DiscoveredAgent:
                 'vars'  : np.array(vars)}
 
 class Agent:
-    def __init__(self, i, domain, port):
+    def __init__(self, i, domain, port, simulation = False):
         # Informazioni per la comunicazione
 
         # Broadcast
@@ -70,7 +70,11 @@ class Agent:
         self.broadcast_port = 5555
 
         # DPOP
-        self.host = self.getIPAddress()
+        if simulation:
+            self.host = "127.0.0.1"
+        else:
+            self.host = self.getIPAddress()
+
         self.port = port
 
         # Variabili Agente
@@ -93,25 +97,24 @@ class Agent:
 
         self.msgs = {}  # The dict where all the received messages are stored
 
+        if not simulation:
+            # Inizia ad annunciarti e ad ascoltare annunci sulla rete
+            self.annouceThread = threading.Thread(  name    = 'Announcing-Thread-of-Agent-' + str( self.id ),
+                                                    target  = self.announceMyselfInTheNetwork,
+                                                    kwargs  = { 'myself' : self }
+                                                    )
 
-        # Inizia ad annunciarti e ad ascoltare annunci sulla rete
-        self.annouceThread = threading.Thread(  name    = 'Announcing-Thread-of-Agent-' + str( self.id ),
-                                                target  = self.announceMyselfInTheNetwork,
-                                                kwargs  = { 'myself' : self }
-                                                )
+            self.readAnnouncementThread = threading.Thread( name    = 'Read-Announcement-Thread-of-Agent-' + str(self.id),
+                                                            target  = self.getOtherAgentsAnnouncement,
+                                                            kwargs  = { 'myself': self }
+                                                            )
 
-        self.readAnnouncementThread = threading.Thread( name    = 'Read-Announcement-Thread-of-Agent-' + str(self.id),
-                                                        target  = self.getOtherAgentsAnnouncement,
-                                                        kwargs  = { 'myself': self }
-                                                        )
+            self.annouceThread.setDaemon(True)
+            self.readAnnouncementThread.setDaemon(True)
 
-        self.annouceThread.setDaemon(True)
-        self.readAnnouncementThread.setDaemon(True)
-
-        self.annouceThread.start()
-        self.readAnnouncementThread.start()
-
-        # Inizio ad ascoltare i messaggi in arrivo sulla mia porta
+            # Inizio ad ascoltare i messaggi in arrivo sulla mia porta
+            self.annouceThread.start()
+            self.readAnnouncementThread.start()
 
     def getIPAddress(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -182,12 +185,11 @@ class Agent:
 
         sock.close()
 
-    # @TODO: Funzione da terminare, quando sara' effettivamete tutto distribuito
     def getOtherAgentsAnnouncement(self, myself):
         listening_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        #listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         listening_socket.bind( ('', myself.broadcast_port) )
 

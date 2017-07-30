@@ -4,18 +4,18 @@ import numpy as np
 
 class WashingMachineCycle():
     COTTON_60 = {
-                    'name'  : 'Cotton 60',
-                    'power' : [10, 15, 20, 8, 5]
-                }
+        'name' : 'Cotton 60',
+        'power': [100, 1540, 1550, 1550, 1530, 230, 190, 280, 500, 490]
+    }
 
     COTTON_30 = {
-                    'name' : 'Cotton 30',
-                    'power': [30, 30, 30, 8, 10, 3, 2]
-                }
+        'name' : 'Cotton 30',
+        'power': [1550, 100, 80, 60, 60, 60, 100, 60, 280, 320, 430, 500]
+    }
 
 class WashingMachine(Agent):
-    def __init__(self, id, addr, port):
-        super().__init__(id, addr, port)
+    def __init__(self, id, addr, port, simulation = False):
+        super().__init__(id, addr, port, simulation)
         self.name               = "WashingMachine"
         self.timeToEndBefore    = None
         self.timeToStartAfter   = None

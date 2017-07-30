@@ -5,8 +5,7 @@
         {
           "type"        : "WashingMachine",
           "cycle"       : "COTTON_30",
-          "end_before"  : 50,
-          "start_after" : 40
+          "end_before"  : 50
         },
         {
           "type"        : "WashingMachine",
@@ -35,20 +34,18 @@
         }
       ],
       "cost_file" : "20170725MGPPrezzi.xml",
-      "solar_panel_file" : ""
+      "solar_panel_radiation" : "HIGH"
       
     },
     {
       "agents" : [
         {
           "type"        : "WashingMachine",
-          "cycle"       : "COTTON_30",
-          "end_before"  : 10
+          "cycle"       : "COTTON_30"
         },
         {
           "type"        : "WashingMachine",
-          "cycle"       : "COTTON_60",
-          "start_after" : 60
+          "cycle"       : "COTTON_60"
         },
         {
           "type"        : "WashingMachine",
@@ -68,7 +65,7 @@
         }
       ],
       "cost_file" : "20170726MGPPrezzi.xml",
-      "solar_panel_file" : ""
+      "solar_panel_radiation" : "MEDIUM"
       
     }
   ]

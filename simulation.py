@@ -31,6 +31,7 @@ from Boiler import Boiler
 SOLAR PANEL
 """
 from SolarPanel import SolarPanel
+from SolarPanel import SolarPanelRadiation
 
 """
 BATTERY
@@ -68,6 +69,12 @@ printTitle( "Avvio simulazione {}".format(nome_scenario) )
 # Elimino i vecchi file di output
 
 output_folder           = os.path.join(dir, "output")
+
+try:
+    os.mkdir(output_folder)
+except FileExistsError:
+    pass
+
 scenario_output_folder  = os.path.join(output_folder, nome_scenario)
 
 try:
@@ -109,7 +116,7 @@ for day, desc in enumerate( data['days'] ):
         print("\tCreo agente {} con id {}".format(str(agent["type"]), id_number))
 
         if agent_type == "washingmachine":
-            ag =  WashingMachine(id_number, range(0, 96), port_number)
+            ag =  WashingMachine(id_number, range(0, 96), port_number, simulation=True)
 
             if "cycle" in agent:
                 ag.cycle = getattr(WashingMachineCycle, str(agent['cycle']) )
@@ -121,7 +128,7 @@ for day, desc in enumerate( data['days'] ):
                 ag.startAfter( int(agent["start_after"]) )
 
         elif agent_type == "dishwasher":
-            ag =  DishWasher(id_number, range(0, 96), port_number)
+            ag =  DishWasher(id_number, range(0, 96), port_number, simulation=True)
 
             if "cycle" in agent:
                 ag.cycle = getattr(DishWasherCycle, str(agent['cycle']) )
@@ -133,7 +140,7 @@ for day, desc in enumerate( data['days'] ):
                 ag.startAfter( int(agent["start_after"]) )
 
         elif agent_type == "boiler":
-            ag =  Boiler(id_number, range(0, 96), port_number)
+            ag =  Boiler(id_number, range(0, 96), port_number, simulation=True)
 
             if "initial_qty" in agent:
                 ag.setQty( int(agent["initial_qty"]) )
@@ -154,7 +161,7 @@ for day, desc in enumerate( data['days'] ):
                 ag.startAfter( int(agent["start_after"]) )
 
         elif agent_type == "battery":
-            ag = Battery(id_number, range(0, 96), port_number)
+            ag = Battery(id_number, range(0, 96), port_number, simulation=True)
 
             if "max_capacity" in agent:
                 ag.max_capacity = int(agent["max_capacity"])
@@ -172,12 +179,17 @@ for day, desc in enumerate( data['days'] ):
             port_number += 1
             id_number   += 1
 
-    print("\tSolarPanel con file: {}".format(desc['solar_panel_file']))
-    ag = SolarPanel(id_number, range(0, 96), port_number)
-    port_number += 1
-    id_number += 1
+    if "solar_panel_radiation" in desc:
+        ag = SolarPanel(id_number, range(0, 96), port_number, simulation=True)
 
-    agents.append(ag)
+        ag.setRadiation( getattr(SolarPanelRadiation, str(desc['solar_panel_radiation']).upper()) )
+
+        port_number += 1
+        id_number += 1
+
+        agents.append(ag)
+
+        print("\tSolarPanel con radiazioni: {}".format(desc['solar_panel_radiation']))
 
     # Dopo aver creato tutti gli agenti, li metto in comunicazione uno con l'altro
     for a1 in agents:
@@ -193,8 +205,10 @@ for day, desc in enumerate( data['days'] ):
     for a in agents:
         if a.id == rootID:
             a.isRoot = True
+            a.rootID = rootID
         else:
             a.isRoot = False
+            a.rootID = rootID
 
     # Avvio tutti i processi necessari
     parent_pid = os.getpid()
