@@ -59,17 +59,23 @@ class Battery(Agent):
         self.debug("Operazioni post ottimizzazione")
 
         # Attendo il ciclo di tutti gli altri agenti coinvolti
+        start_time = time.time()
         while True:
             all_other_agents_cycle_msg_arrived = True
             time.sleep(0.5)
             for id in self.otherAgents:
                 if ( (int(id), str(msgType.FINAL_CYCLE)) ) not in self.msgs:
-                    self.debug(id)
                     all_other_agents_cycle_msg_arrived = False
                     break
 
             if all_other_agents_cycle_msg_arrived == True:
                 break
+
+            # Se trascorro più di 10 secondi bloccato, esco ed attendo la prossima
+            # ottimizzazione
+            elapsed_time = time.time() - start_time
+            if elapsed_time > 10:
+                return False
 
         solar_panel_cycle = []
         others_cycles = {}

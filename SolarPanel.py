@@ -31,7 +31,7 @@ class SolarPanel(Agent):
 
         cycle = np.genfromtxt(file_path)
         cycle = cycle * 1.98 * 0.866 # Radiazione * costante * cos(30)
-        
+
         self.cycle  = np.array(cycle)
 
         if (len(self.cycle) != consts.kTIME_SLOTS):
