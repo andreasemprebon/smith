@@ -4,6 +4,7 @@ import json
 from shutil import move, rmtree
 import numpy as np
 import constants as const
+import FixedLoad
 
 """
 COSTO
@@ -190,6 +191,10 @@ for day, desc in enumerate( data['days'] ):
         agents.append(ag)
 
         print("\tSolarPanel con radiazioni: {}".format(desc['solar_panel_radiation']))
+
+    if "fixed_load_file" in desc:
+        FixedLoad.readFixedLoad( desc['fixed_load_file'] )
+        print("\tFile Fixed Load associato: {}".format( desc['fixed_load_file'] ))
 
     # Dopo aver creato tutti gli agenti, li metto in comunicazione uno con l'altro
     for a1 in agents:
