@@ -261,6 +261,52 @@ for day, desc in enumerate( data['days'] ):
             nome_file = os.path.splitext(the_file)[0]
             final_output_dict[nome_file] = ar
 
+    # Calcolo la spesa energetica finale ed il consumo totale netto
+    spesa_energetica            = []
+    consumo_totale_netto        = []
+    solar_panel_used_power      = []
+    battery_power_consumption   = np.zeros( const.kTIME_SLOTS )
+    solar_panel_power           = np.zeros( const.kTIME_SLOTS )
+    solar_panel_usage           = np.zeros(const.kTIME_SLOTS)
+
+    for t in range(0, const.kTIME_SLOTS):
+        power_at_t = 0
+
+        arr_cost = np.array(final_output_dict["cost"])
+        cost_at_t = arr_cost[t]
+
+        for f in final_output_dict:
+            # Considero solo i cicli degli elettrodomestici e niente altro per il calcolo della
+            # spesa energetica totale
+            if "cycle" in f:
+                arr_cycle = np.array(final_output_dict[f])
+
+                if "Battery" in f:
+                    battery_power_consumption[t] = arr_cycle[t]
+                    if battery_power_consumption[t] < 0:
+                        power_at_t = power_at_t + battery_power_consumption[t]
+                else:
+                    power_at_t = power_at_t + arr_cycle[t]
+
+                if "SolarPanel" in f:
+                    solar_panel_power[t] = arr_cycle[t]
+
+        power_at_t = max(0, power_at_t)
+
+        spesa_at_t = power_at_t * cost_at_t * const.kHOUR_TO_TIMESLOT_RELATION / 1000
+
+        spesa_energetica.append( spesa_at_t )
+        consumo_totale_netto.append( power_at_t )
+
+    for t in range(0, const.kTIME_SLOTS):
+        solar_panel_usage[t] = power_at_t
+        if battery_power_consumption[t] > 0:
+            solar_panel_usage[t] = solar_panel_usage[t] + battery_power_consumption[t]
+
+    final_output_dict["consumo_totale_netto"]   = np.array(consumo_totale_netto)
+    final_output_dict["spesa_energetica"]       = np.array(spesa_energetica)
+    final_output_dict["solar_panel_real_usage"] = np.array(solar_panel_usage)
+
     out_array = np.column_stack( list( final_output_dict.values() ))
     np.savetxt(day_merged_output, out_array, fmt='%i', delimiter=',', header=",".join(final_output_dict.keys()), comments=" ")
 

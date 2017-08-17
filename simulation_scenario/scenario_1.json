@@ -28,13 +28,14 @@
         },
         {
           "type"          : "Battery",
-          "max_capacity"  : 1500,
-          "charge"        : 2000,
+          "max_capacity"  : 2000,
+          "charge"        : 1500,
           "max_power"     : 2000
         }
       ],
       "cost_file" : "20170725MGPPrezzi.xml",
-      "solar_panel_radiation" : "HIGH"
+      "solar_panel_radiation" : "HIGH",
+      "fixed_load_file" : "fixed_load_163_8W.csv"
       
     },
     {
@@ -59,13 +60,14 @@
         },
         {
           "type"          : "Battery",
-          "max_capacity"  : 500,
-          "charge"        : 2000,
+          "max_capacity"  : 2000,
+          "charge"        : 500,
           "max_power"     : 2000
         }
       ],
       "cost_file" : "20170726MGPPrezzi.xml",
-      "solar_panel_radiation" : "MEDIUM"
+      "solar_panel_radiation" : "MEDIUM",
+      "fixed_load_file" : "fixed_load_163_8W.csv"
       
     }
   ]

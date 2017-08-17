@@ -3,6 +3,7 @@ import constants as consts
 import numpy as np
 from message import MessageType as msgType
 import time
+import os
 
 class Battery(Agent):
     def __init__(self, id, addr, port, simulation = False):
@@ -77,6 +78,9 @@ class Battery(Agent):
             if elapsed_time > 10:
                 return False
 
+        charge_value    = []
+        charge_perc     = []
+
         solar_panel_cycle = []
         others_cycles = {}
         for msg_key in self.msgs:
@@ -109,4 +113,18 @@ class Battery(Agent):
 
             self.charge = self.charge + (finale_cycle[t] * consts.kHOUR_TO_TIMESLOT_RELATION)
 
+            charge_value.append( self.charge )
+            charge_perc.append( self.charge / self.max_capacity * 100 )
+
         self.saveFinalCycle( finale_cycle )
+
+        # La batteria salva anche altre informazioni oltre al proprio ciclo, come il livello di carica
+        # ad ogni time-step, sia in valori assoluti che in percentuale
+        dir = os.path.dirname(__file__)
+        output_folder = os.path.join(dir, "output")
+
+        charge_value_filename_path  = os.path.join(output_folder, '{}_{}_charge_value.csv'.format(self.name, self.id))
+        charge_perc_filename_path   = os.path.join(output_folder, '{}_{}_charge_perc.csv'.format(self.name, self.id))
+
+        np.savetxt(charge_value_filename_path,  np.array(charge_value), fmt='%i', delimiter=',')
+        np.savetxt(charge_perc_filename_path,   np.array(charge_perc), fmt='%i', delimiter=',')
