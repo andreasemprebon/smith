@@ -316,6 +316,8 @@ for day, desc in enumerate( data['days'] ):
     final_output_dict["consumo_totale_netto"]   = np.array(consumo_totale_netto)
     final_output_dict["spesa_energetica"]       = np.array(spesa_energetica)
 
+    # Fromato delle colonne del file csv. L'ultima colonna, la spesa energetica, ha come formato un float con 4
+    # cifre deciamli dopo la virgola. Tutte le altre colonne sono interi
     column_format = '%i,' * (len(final_output_dict) - 1)
     column_format = '{}%.4f'.format(column_format)
 
