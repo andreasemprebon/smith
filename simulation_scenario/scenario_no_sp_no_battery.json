@@ -1,0 +1,60 @@
+{
+  "days": [
+    {
+      "agents" : [
+        {
+          "type"        : "WashingMachine",
+          "cycle"       : "COTTON_30",
+          "end_before"  : 50
+        },
+        {
+          "type"        : "WashingMachine",
+          "cycle"       : "COTTON_60",
+          "start_after" : 20
+        },
+        {
+          "type"        : "DishWasher",
+          "cycle"       : "VERY_DIRTY",
+          "start_after" : 30
+        },
+        {
+          "type"          : "Boiler",
+          "initial_qty"   : 80,
+          "target_qty"    : 100,
+          "end_before"    : 70,
+          "max_qty"       : 100,
+          "power_when_on" : 10,
+          "start_after"   : 60
+        }
+      ],
+      "cost_file" : "20170725MGPPrezzi.xml",
+      "fixed_load_file" : "fixed_load_163_8W.csv"
+      
+    },
+    {
+      "agents" : [
+        {
+          "type"        : "WashingMachine",
+          "cycle"       : "COTTON_30"
+        },
+        {
+          "type"        : "WashingMachine",
+          "cycle"       : "COTTON_60"
+        },
+        {
+          "type"        : "WashingMachine",
+          "cycle"       : "COTTON_60",
+          "start_after" : 80
+        },
+        {
+          "type"        : "DishWasher",
+          "cycle"       : "VERY_DIRTY",
+          "start_after" : 60
+        }
+      ],
+      "cost_file" : "20170726MGPPrezzi.xml",
+      "fixed_load_file" : "fixed_load_163_8W.csv"
+      
+    }
+  ]
+}
