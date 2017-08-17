@@ -4,6 +4,11 @@ import json
 from shutil import move, rmtree
 import numpy as np
 import constants as const
+from collections import OrderedDict
+
+"""
+FIXED LOAD
+"""
 import FixedLoad
 
 """
@@ -253,7 +258,7 @@ for day, desc in enumerate( data['days'] ):
 
     day_merged_output = os.path.join(day_output_folder, "merged_output.csv")
 
-    final_output_dict = {}
+    final_output_dict = OrderedDict()
     for the_file in os.listdir(day_output_folder):
         file_path = os.path.join(day_output_folder, the_file)
         if os.path.isfile(file_path):
@@ -305,12 +310,16 @@ for day, desc in enumerate( data['days'] ):
 
         solar_panel_usage[t] = -1 * min(solar_panel_usage[t], solar_panel_power[t])
 
+    final_output_dict.move_to_end("cost")
 
+    final_output_dict["solar_panel_real_usage"] = np.array(solar_panel_usage)
     final_output_dict["consumo_totale_netto"]   = np.array(consumo_totale_netto)
     final_output_dict["spesa_energetica"]       = np.array(spesa_energetica)
-    final_output_dict["solar_panel_real_usage"] = np.array(solar_panel_usage)
+
+    column_format = '%i,' * (len(final_output_dict) - 1)
+    column_format = '{}%.4f'.format(column_format)
 
     out_array = np.column_stack( list( final_output_dict.values() ))
-    np.savetxt(day_merged_output, out_array, fmt='%i', delimiter=',', header=",".join(final_output_dict.keys()), comments=" ")
+    np.savetxt(day_merged_output, out_array, fmt=column_format, delimiter=',', header=",".join(final_output_dict.keys()), comments=" ")
 
 printTitle( "Fine simulazione {}".format(nome_scenario) )
