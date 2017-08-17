@@ -293,7 +293,7 @@ for day, desc in enumerate( data['days'] ):
 
         power_at_t = max(0, power_at_t)
 
-        spesa_at_t = power_at_t * cost_at_t * const.kHOUR_TO_TIMESLOT_RELATION / 1000
+        spesa_at_t = power_at_t * cost_at_t * const.kHOUR_TO_TIMESLOT_RELATION / 1000000
 
         spesa_energetica.append( spesa_at_t )
         consumo_totale_netto.append( power_at_t )
