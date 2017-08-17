@@ -65,7 +65,7 @@
           "max_power"     : 2000
         }
       ],
-      "cost_file" : "20170726MGPPrezzi.xml",
+      "cost_file" : "feriale.csv",
       "solar_panel_radiation" : "MEDIUM",
       "fixed_load_file" : "fixed_load_163_8W.csv"
       

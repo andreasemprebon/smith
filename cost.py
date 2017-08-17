@@ -28,35 +28,43 @@ def readCostFromFile( cost_file ):
     input_folder    = os.path.join(dir, "gme")
     filename        = os.path.join(input_folder, cost_file)
 
-    # Leggo il file XML
-    tree = etree.parse(filename)
+    # Se il file è un XML dal mercato dell'energia allora eseguo una certa procedura, altrimenti
+    # se è un classico csv lo leggo senza altri problemi
+    extension = os.path.splitext(filename)[1]
 
-    # Ottengo la root
-    prezzi_root = tree.getroot()
+    if "csv" in extension:
+        cost_raw = np.genfromtxt(filename)
+        cost = np.array(cost_raw)
+    else:
+        # Leggo il file XML
+        tree = etree.parse(filename)
 
-    prezzi = prezzi_root.findall("./Prezzi")
+        # Ottengo la root
+        prezzi_root = tree.getroot()
 
-    tmp_cost = {}
-    for prezzo in prezzi:
-        ora = int( prezzo.find("Ora").text )
-        pun = prezzo.find("PUN").text
-        pun = pun.replace(",", ".")
-        costo = float( pun )
-        tmp_cost[ora - 1] = costo
+        prezzi = prezzi_root.findall("./Prezzi")
+
+        tmp_cost = {}
+        for prezzo in prezzi:
+            ora = int( prezzo.find("Ora").text )
+            pun = prezzo.find("PUN").text
+            pun = pun.replace(",", ".")
+            costo = float( pun )
+            tmp_cost[ora - 1] = costo
 
 
-    ord_cost = []
-    for ora in sorted(tmp_cost):
-        ord_cost.append( tmp_cost[ora] )
+        ord_cost = []
+        for ora in sorted(tmp_cost):
+            ord_cost.append( tmp_cost[ora] )
 
-    ord_cost = np.array( ord_cost )
+        ord_cost = np.array( ord_cost )
 
-    cost = []
-    for t in range(0, consts.kTIME_SLOTS):
-        index = int( np.floor( t / 4 ) )
-        cost.append( ord_cost[index] )
+        cost = []
+        for t in range(0, consts.kTIME_SLOTS):
+            index = int( np.floor( t / 4 ) )
+            cost.append( ord_cost[index] )
 
-    cost = np.array( cost )
+        cost = np.array( cost )
 
     if len(cost) != consts.kTIME_SLOTS:
         raise ValueError("Il vettore di costo ha una dimensione errata")

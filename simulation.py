@@ -311,6 +311,8 @@ for day, desc in enumerate( data['days'] ):
         solar_panel_usage[t] = -1 * min(solar_panel_usage[t], solar_panel_power[t])
 
     final_output_dict.move_to_end("cost")
+    column_format = '%i,' * (len(final_output_dict) - 1)
+    column_format = '{}%.2f'.format(column_format)
 
     final_output_dict["solar_panel_real_usage"] = np.array(solar_panel_usage)
     final_output_dict["consumo_totale_netto"]   = np.array(consumo_totale_netto)
@@ -318,8 +320,8 @@ for day, desc in enumerate( data['days'] ):
 
     # Fromato delle colonne del file csv. L'ultima colonna, la spesa energetica, ha come formato un float con 4
     # cifre deciamli dopo la virgola. Tutte le altre colonne sono interi
-    column_format = '%i,' * (len(final_output_dict) - 1)
-    column_format = '{}%.4f'.format(column_format)
+
+    column_format = '{},%i,%i,%.4f'.format(column_format)
 
     out_array = np.column_stack( list( final_output_dict.values() ))
     np.savetxt(day_merged_output, out_array, fmt=column_format, delimiter=',', header=",".join(final_output_dict.keys()), comments=" ")
