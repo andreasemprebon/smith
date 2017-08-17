@@ -289,7 +289,7 @@ for day, desc in enumerate( data['days'] ):
                     power_at_t = power_at_t + arr_cycle[t]
 
                 if "SolarPanel" in f:
-                    solar_panel_power[t] = arr_cycle[t]
+                    solar_panel_power[t] = abs(arr_cycle[t])
 
         power_at_t = max(0, power_at_t)
 
@@ -302,6 +302,9 @@ for day, desc in enumerate( data['days'] ):
         solar_panel_usage[t] = power_at_t
         if battery_power_consumption[t] > 0:
             solar_panel_usage[t] = solar_panel_usage[t] + battery_power_consumption[t]
+
+        solar_panel_usage[t] = -1 * min(solar_panel_usage[t], solar_panel_power[t])
+
 
     final_output_dict["consumo_totale_netto"]   = np.array(consumo_totale_netto)
     final_output_dict["spesa_energetica"]       = np.array(spesa_energetica)
