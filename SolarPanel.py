@@ -30,7 +30,7 @@ class SolarPanel(Agent):
         file_path                       = os.path.join(solar_panel_radiation_folder, self.radiation_type)
 
         cycle = np.genfromtxt(file_path)
-        cycle = cycle * 1.98 * 0.866 # Radiazione * costante * cos(30)
+        cycle = cycle * 1.98 # Radiazione * costante
 
         self.cycle  = np.array(cycle)
 
