@@ -9,6 +9,7 @@ import VALUEMessagePropagation
 import numpy as np
 import constants as consts
 import os
+import sys
 
 class DiscoveredAgent:
     def __init__(self, id, addr, port):
@@ -96,6 +97,10 @@ class Agent:
         self.pc = None  # A list of the pseudo-childrens' ids
 
         self.msgs = {}  # The dict where all the received messages are stored
+
+        ### PERFORMANCE
+        self.messages_sent_total_size = 0 #bytes
+        self.messages_sent_number     = 0
 
         if not simulation:
             # Inizia ad annunciarti e ad ascoltare annunci sulla rete
@@ -230,7 +235,7 @@ class Agent:
         self.otherAgents[ id ] = discovered
 
     """
-    Invia i messaggi tramite il protocollo UDP:
+    Invia i messaggi tramite il protocollo TCP/IP:
         dest_node_id:   id nodo dell'Agente destinatario
         title:          titolo del messaggio
         data:           payload del messaggio
@@ -246,6 +251,10 @@ class Agent:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect( (dest.addr, dest.port) )
             res = sock.sendall( pdata )
+
+            # Performance
+            self.messages_sent_total_size += sys.getsizeof(pdata)
+            self.messages_sent_number     += 1
         except:
             time.sleep(0.1)
             sock.close()
@@ -298,6 +307,15 @@ class Agent:
         self.msgs[(int(msg_sender), str(msg_type))] = message.Message(msg_type, msg_sender, msg_value)
 
         # self.debug( self.msgs )
+
+    def printPerformace(self):
+        # Prestazioni relative alla dimensione ed al numero di messaggi inviati
+        performace_string = "PERFORMANCE:"
+
+        performace_string += "\n\tMessages sent total size: {}".format(self.messages_sent_total_size)
+        performace_string += "\n\tMessages sent number: {}".format(self.messages_sent_number)
+
+        self.debug(performace_string)
 
     def computeFinalCycle(self):
         # Calcolo il mio ciclo e lo invio sulla rete
@@ -358,5 +376,7 @@ class Agent:
 
         if not self.optimizableAgent:
             self.waitOptimizationEnd()
+
+        self.printPerformace()
 
         return True

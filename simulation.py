@@ -5,6 +5,7 @@ from shutil import move, rmtree
 import numpy as np
 import constants as const
 from collections import OrderedDict
+import timeit
 
 """
 FIXED LOAD
@@ -233,10 +234,20 @@ for day, desc in enumerate( data['days'] ):
             if childid == 0:
                 a.start()
 
+    start_time = timeit.default_timer()
+
     # Attendo che tutti i figli termino
     if parent_pid == os.getpid():
         for i in children:
             os.wait()
+
+        # PERFORMANCE
+        elapsed = timeit.default_timer() - start_time
+
+        performace_string = "SYSTEM PERFORMANCE:"
+        performace_string += "\n\tTime elapsed: {}".format(elapsed)
+
+        print(performace_string)
 
     # Termino tutti i processi figli lasciando in vita solamente il padre
     if parent_pid != os.getpid():
