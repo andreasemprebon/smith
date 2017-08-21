@@ -177,7 +177,7 @@ for day, desc in enumerate( data['days'] ):
                 ag.charge = int( agent["charge"] )
 
             if "max_power" in agent:
-                ag.max_power = int( agent["max_power"] )
+                ag.setMaxPower(int( agent["max_power"] ))
         else:
             raise NameError( "Impossibile creare un agente per {}".format(str(agent["type"])) )
 

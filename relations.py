@@ -3,8 +3,6 @@ import numpy as np
 import constants as consts
 import FixedLoad
 
-FixedLoad.readFixedLoad("")
-
 def createAllRelationForAgent(agent):
     relations = []
     for agent2 in [ agent.p ] + agent.pp:
