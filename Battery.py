@@ -29,7 +29,7 @@ class Battery(Agent):
 
         self.maxDischargeIstantaneous = self.max_power * consts.kHOUR_TO_TIMESLOT_RELATION
         self.maxRechargeIstantaneous = self.max_power * consts.kHOUR_TO_TIMESLOT_RELATION
-        
+
     """
     Funzioni essenzali per un agente
     """
