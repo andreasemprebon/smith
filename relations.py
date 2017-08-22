@@ -1,7 +1,6 @@
 import cost
 import numpy as np
 import constants as consts
-import FixedLoad
 
 def createAllRelationForAgent(agent):
     relations = []
@@ -60,9 +59,6 @@ def valueOfAssignmentPerAgents(x1, x2, agent1, agent2):
                  'cost'     : consts.kMAX_VALUE }
 
     used_power = np.array( assignment_agent1['vars'] + assignment_agent2['vars'] )
-
-    # Aggiungo il valore di potenza usata anche per il carico fisso
-    used_power = np.array( used_power + FixedLoad.getCycle() )
 
     # Controllo che il vincolo dei 3kW non venga superato
     # con l'assegnazione corrente

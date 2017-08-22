@@ -10,7 +10,7 @@ import timeit
 """
 FIXED LOAD
 """
-import FixedLoad
+from FixedLoad import FixedLoad
 
 """
 COSTO
@@ -199,7 +199,15 @@ for day, desc in enumerate( data['days'] ):
         print("\tSolarPanel con radiazioni: {}".format(desc['solar_panel_radiation']))
 
     if "fixed_load_file" in desc:
-        FixedLoad.readFixedLoad( desc['fixed_load_file'] )
+        ag = FixedLoad(id_number, range(0, 96), port_number, simulation=True)
+
+        ag.readFixedLoad( desc['fixed_load_file'] )
+
+        port_number += 1
+        id_number   += 1
+
+        agents.append(ag)
+
         print("\tFile Fixed Load associato: {}".format( desc['fixed_load_file'] ))
 
     # Dopo aver creato tutti gli agenti, li metto in comunicazione uno con l'altro

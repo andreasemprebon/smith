@@ -4,7 +4,6 @@ import numpy as np
 from message import MessageType as msgType
 import time
 import os
-import FixedLoad
 
 class Battery(Agent):
     def __init__(self, id, addr, port, simulation = False):
@@ -100,9 +99,6 @@ class Battery(Agent):
                 else:
                     others_cycles[sender_id] = msg.value
 
-        # Aggiungo il carico fisso come un altro agente con ID negativo -99 in modo che non crei conflitti
-        others_cycles[-99] = FixedLoad.getCycle()
-
         # Calcolo il mio ciclo: dove gli altri agenti usano potenza io mi scarico di una determinata
         # quantità massimo, altrimenti mi carico con l'energia del pannello solare
 
@@ -121,7 +117,9 @@ class Battery(Agent):
             else:
                 finale_cycle[t] = self.getPowerFromRecharge( avail_power[t] )
 
-            self.charge = self.charge + (finale_cycle[t] * consts.kHOUR_TO_TIMESLOT_RELATION)
+            finale_cycle[t] = finale_cycle[t] * consts.kHOUR_TO_TIMESLOT_RELATION
+
+            self.charge = self.charge + finale_cycle[t]
 
             charge_value.append( self.charge )
             charge_perc.append( self.charge / self.max_capacity * 100 )
