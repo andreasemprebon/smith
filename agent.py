@@ -336,7 +336,7 @@ class Agent:
         output_folder = os.path.join(dir, "output")
         filename_path = os.path.join(output_folder, '{}_{}_cycle.csv'.format(self.name, self.id))
 
-        np.savetxt(filename_path, np.array( cycle ), fmt='%i', delimiter=',')
+        np.savetxt(filename_path, np.array( cycle ), fmt='%.2f', delimiter=',')
 
     def debug(self, text):
         print("[{} {}]: {}".format(self.name, self.id, text))

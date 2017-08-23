@@ -46,19 +46,19 @@ class Battery(Agent):
     """
     Funzioni batteria
     """
-    def getPowerFromConsumption(self, c):
+    def discharge(self, c):
         if self.charge <= 0:
             return 0
 
-        return min(self.charge, min(c, self.maxDischargeIstantaneous))
+        return min(self.charge, min(c * consts.kHOUR_TO_TIMESLOT_RELATION, self.maxDischargeIstantaneous))
 
-    def getPowerFromRecharge(self, sp):
+    def recharge(self, sp):
         if self.charge >= self.max_capacity:
             return 0
 
         delta = self.max_capacity - self.charge
 
-        return min(sp, min(self.maxRechargeIstantaneous, delta))
+        return min(sp * consts.kHOUR_TO_TIMESLOT_RELATION, min(self.maxRechargeIstantaneous, delta))
 
     # Sono un agente non ottimizzabile, attendo la fine della procedura di ottimizzazione per
     # determinare il mio ciclo con carica e scarica.
@@ -101,30 +101,26 @@ class Battery(Agent):
 
         # Calcolo il mio ciclo: dove gli altri agenti usano potenza io mi scarico di una determinata
         # quantità massimo, altrimenti mi carico con l'energia del pannello solare
-
         avail_power     = np.zeros( consts.kTIME_SLOTS )
         finale_cycle    = np.zeros( consts.kTIME_SLOTS )
         for t in range(0, consts.kTIME_SLOTS):
-            current_cycle = solar_panel_cycle[t]
+            current_cycle = 0
             for id in others_cycles:
                 current_cycle += others_cycles[id][t]
 
-            current_cycle   = max(0, current_cycle)
-            avail_power[t]  = max(0, abs(solar_panel_cycle[t]) - current_cycle)
+            avail_power[t] = max(0, abs(solar_panel_cycle[t]) - current_cycle)
 
-            if current_cycle > 0:
-                finale_cycle[t] = -1 * self.getPowerFromConsumption( current_cycle )
+            if avail_power[t] > 0:
+                finale_cycle[t] = self.recharge( avail_power[t] )
             else:
-                finale_cycle[t] = self.getPowerFromRecharge( avail_power[t] )
-
-            finale_cycle[t] = finale_cycle[t] * consts.kHOUR_TO_TIMESLOT_RELATION
+                delta_power = abs(solar_panel_cycle[t]) - current_cycle
+                finale_cycle[t] = self.discharge( delta_power )
 
             self.charge = self.charge + finale_cycle[t]
+            charge_value.append(self.charge)
+            charge_perc.append(self.charge / self.max_capacity * 100)
 
-            charge_value.append( self.charge )
-            charge_perc.append( self.charge / self.max_capacity * 100 )
-
-        self.saveFinalCycle( finale_cycle )
+        self.saveFinalCycle(finale_cycle)
 
         # La batteria salva anche altre informazioni oltre al proprio ciclo, come il livello di carica
         # ad ogni time-step, sia in valori assoluti che in percentuale
