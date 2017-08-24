@@ -101,20 +101,18 @@ class Battery(Agent):
 
         # Calcolo il mio ciclo: dove gli altri agenti usano potenza io mi scarico di una determinata
         # quantità massimo, altrimenti mi carico con l'energia del pannello solare
-        avail_power     = np.zeros( consts.kTIME_SLOTS )
         finale_cycle    = np.zeros( consts.kTIME_SLOTS )
         for t in range(0, consts.kTIME_SLOTS):
             current_cycle = 0
             for id in others_cycles:
                 current_cycle += others_cycles[id][t]
 
-            avail_power[t] = max(0, abs(solar_panel_cycle[t]) - current_cycle)
+            delta_power = abs(solar_panel_cycle[t]) - current_cycle
 
-            if avail_power[t] > 0:
-                finale_cycle[t] = self.recharge( avail_power[t] )
+            if delta_power > 0:
+                finale_cycle[t] = self.recharge( delta_power )
             else:
-                delta_power = abs(solar_panel_cycle[t]) - current_cycle
-                finale_cycle[t] = self.discharge( delta_power )
+                finale_cycle[t] = -1 * self.discharge( abs(delta_power) )
 
             self.charge = self.charge + finale_cycle[t]
             charge_value.append(self.charge)
