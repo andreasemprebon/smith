@@ -15,7 +15,8 @@ class Boiler(Agent):
 
         # Fonte dati: Edison - media consumi ciclo WaterHeater 16 Giugno
         # Consuma 1150 quando è acceso
-        self.power_when_on = 1150  # W
+        # Per il PoliMi consuma 194, quindi si imposta 194 W
+        self.power_when_on = 194  # W
 
     # Imposta la quantità di acqua calda presente nel boiler
     def setQty(self, val):
