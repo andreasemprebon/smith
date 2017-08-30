@@ -83,6 +83,9 @@ elif hostname == kRaspberryPI_4:
 elif hostname == kRaspberryPI_5:
     agent_id    = 5
     agent       = Battery(agent_id, range(0, 96), 12345)
+else:
+    agent_id = 99
+    agent =  WashingMachine(agent_id, range(0, 96), 12345)
 
 # Se ho un agente impostato, ogni 5 secondi avvio una ottimizzazione
 if agent:

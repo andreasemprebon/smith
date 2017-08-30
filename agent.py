@@ -10,6 +10,7 @@ import numpy as np
 import constants as consts
 import os
 import sys
+import json
 
 class DiscoveredAgent:
     def __init__(self, id, addr, port):
@@ -67,8 +68,9 @@ class Agent:
         # Informazioni per la comunicazione
 
         # Broadcast
-        self.broadcast_addr = "255.255.255.255"
+        self.broadcast_addr = "127.0.0.1"
         self.broadcast_port = 5555
+        self.broadcast_web_port = 5556
 
         # DPOP
         if simulation:
@@ -114,12 +116,19 @@ class Agent:
                                                             kwargs  = { 'myself': self }
                                                             )
 
+            self.replyToRequestFromWebServerThread = threading.Thread(name='Reply-Request-WebServer-Thread-of-Agent-' + str(self.id),
+                                                           target=self.replyToRequestFromWebServer,
+                                                           kwargs={'myself': self}
+                                                           )
+
             self.annouceThread.setDaemon(True)
             self.readAnnouncementThread.setDaemon(True)
+            self.replyToRequestFromWebServerThread.setDaemon(True)
 
             # Inizio ad ascoltare i messaggi in arrivo sulla mia porta
             self.annouceThread.start()
             self.readAnnouncementThread.start()
+            self.replyToRequestFromWebServerThread.start()
 
     def getIPAddress(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -234,6 +243,35 @@ class Agent:
 
         self.otherAgents[ id ] = discovered
 
+    def replyToRequestFromWebServer(self, myself):
+        web_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        web_sock.bind(('', myself.broadcast_web_port))
+        web_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+        while (True):
+            #data, addr = web_sock.recvfrom(65536)
+            #print(addr)
+            #print(data)
+
+            if self.value is not None:
+                start_timestep = self.value
+            else:
+                start_timestep = 0
+            cycle = self.getCycle()
+
+            data = {
+                "name"  : self.name,
+                "start" : start_timestep,
+                "end"   : start_timestep + len(cycle),
+                "ip"    : self.host
+            }
+
+            web_sock.sendto(json.dumps(data).encode(), (myself.broadcast_addr, myself.broadcast_web_port))
+            self.debug("Mando info per il web server")
+            time.sleep(5)
+
+        web_sock.close()
+
     """
     Invia i messaggi tramite il protocollo TCP/IP:
         dest_node_id:   id nodo dell'Agente destinatario
@@ -337,6 +375,10 @@ class Agent:
         filename_path = os.path.join(output_folder, '{}_{}_cycle.csv'.format(self.name, self.id))
 
         np.savetxt(filename_path, np.array( cycle ), fmt='%.2f', delimiter=',')
+
+    def saveAgentJSONDescriptionForWeb(self):
+        dir = os.path.dirname(__file__)
+        output_folder = os.path.join(dir, "..", "shared_resources")
 
     def debug(self, text):
         print("[{} {}]: {}".format(self.name, self.id, text))
