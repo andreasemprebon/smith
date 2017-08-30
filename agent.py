@@ -68,7 +68,7 @@ class Agent:
         # Informazioni per la comunicazione
 
         # Broadcast
-        self.broadcast_addr = "127.0.0.1"
+        self.broadcast_addr = "255.255.255.255"
         self.broadcast_port = 5555
         self.broadcast_web_port = 5556
 
