@@ -261,6 +261,7 @@ class Agent:
 
             data = {
                 "name"  : self.name,
+                "id"    : self.id,
                 "start" : start_timestep,
                 "end"   : start_timestep + len(cycle),
                 "ip"    : self.host
