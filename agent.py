@@ -234,10 +234,9 @@ class Agent:
                     self.addNewDiscoveredAgent(agent_id, agent_addr, agent_port,
                                                isProducingPower = agent_prod_power,
                                                optimizableAgent = agent_optimizable)
-            # Se l'agente è già presente nella mia lista, aggiorno il fatto che sia ancora vivo
-            else:
-                a = self.otherAgents[agent_id]
-                a.timeOfDiscovery = time.time()
+                # Se l'agente è già presente nella mia lista, aggiorno il fatto che sia ancora vivo
+                else:
+                    self.otherAgents[agent_id].timeOfDiscovery = time.time()
 
 
         listening_socket.close()
