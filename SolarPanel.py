@@ -66,14 +66,15 @@ class SolarPanel(Agent):
         start_timestep = 0
         end_timestep = consts.kTIME_SLOTS
 
+        # I segni sono strani perché il ciclo ha i numeri negativi
         cycle = self.getCycle()
         for index in range(0, len(cycle)):
-            if cycle[index] > 0:
+            if cycle[index] < 0:
                 start_timestep = index
                 break
 
         for index in range(start_timestep, len(cycle)):
-            if cycle[index] <= 0:
+            if cycle[index] >= 0:
                 end_timestep = index
                 break
 
@@ -85,9 +86,7 @@ class SolarPanel(Agent):
             "ip"   : self.host
         }
 
-        self.debug(cycle)
-        self.debug(data)
-
+        
         return data
 
     def generateConfigurationForWebServer(self):
