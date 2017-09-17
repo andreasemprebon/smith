@@ -62,6 +62,31 @@ class SolarPanel(Agent):
         return {'status': True,
                 'vars'  : np.array(vars)}
 
+    def packDataForWebServer(self):
+        start_timestep = 0
+        end_timestep = consts.kTIME_SLOTS
+
+        cycle = self.getCycle()
+        for index in range(0, len(cycle)):
+            if cycle[index] > 0:
+                start_timestep = index
+                break
+
+        for index in range(start_timestep, len(cycle)):
+            if cycle[index] <= 0:
+                end_timestep = index
+                break
+
+        data = {
+            "name" : self.name,
+            "id"   : self.id,
+            "start": start_timestep,
+            "end"  : end_timestep,
+            "ip"   : self.host
+        }
+
+        return data
+
     def generateConfigurationForWebServer(self):
         possible_values = {}
         self.writeOnFileConfigurationForWebServer(possible_values)

@@ -288,19 +288,7 @@ class Agent:
             #print(addr)
             #print(data)
 
-            if self.value is not None:
-                start_timestep = int(self.value)
-            else:
-                start_timestep = 0
-            cycle = self.getCycle()
-
-            data = {
-                "name"  : self.name,
-                "id"    : self.id,
-                "start" : start_timestep,
-                "end"   : start_timestep + len(cycle),
-                "ip"    : self.host
-            }
+            data = self.packDataForWebServer()
 
             web_sock.sendto(json.dumps(data).encode(), (myself.broadcast_addr, myself.broadcast_web_port))
             self.debug("Mando info per il web server")

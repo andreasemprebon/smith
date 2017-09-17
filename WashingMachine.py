@@ -76,6 +76,23 @@ class WashingMachine(Agent):
     def removeTimeToStartAfter(self):
         self.timeToStartAfter = None
 
+    def packDataForWebServer(self):
+        if self.value is not None:
+            start_timestep = int(self.value)
+        else:
+            start_timestep = 0
+        cycle = self.getCycle()
+
+        data = {
+            "name" : self.name,
+            "id"   : self.id,
+            "start": start_timestep,
+            "end"  : start_timestep + len(cycle),
+            "ip"   : self.host
+        }
+
+        return data
+
     def generateConfigurationForWebServer(self):
         current_cycle_name = ""
         cycles = [name for name, value in vars(WashingMachineCycle).items() if not name.startswith('_')]

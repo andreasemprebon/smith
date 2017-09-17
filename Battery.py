@@ -134,6 +134,18 @@ class Battery(Agent):
         np.savetxt(charge_value_filename_path,  np.array(charge_value), fmt='%i', delimiter=',')
         np.savetxt(charge_perc_filename_path,   np.array(charge_perc), fmt='%i', delimiter=',')
 
+    def packDataForWebServer(self):
+
+        data = {
+            "name" : self.name,
+            "id"   : self.id,
+            "start": 0,
+            "end"  : consts.kTIME_SLOTS,
+            "ip"   : self.host
+        }
+
+        return data
+
     def generateConfigurationForWebServer(self):
         possible_values = {}
         self.writeOnFileConfigurationForWebServer(possible_values)
