@@ -75,9 +75,15 @@ class WashingMachine(Agent):
 
     def generateConfigurationForWebServer(self):
         possible_values = {}
-        possible_values['cycle']        = { 'display_name' : 'Cycle', 'values' : ['COTTON_30', 'COTTON_60'] }
-        possible_values['start_after']  = { 'display_name' : 'Starting Time', 'values' : list(range(0, 25)) }
-        possible_values['end_before']   = { 'display_name' : 'Ending Time', 'values' : list(range(0, 25)) }
+        possible_values['cycle']        = { 'display_name' : 'Cycle',
+                                            'values' : ['COTTON_30', 'COTTON_60'],
+                                            'type' : 'select' }
+        possible_values['start_after']  = { 'display_name' : 'Starting Time',
+                                            'values' : list(range(0, 25)),
+                                            'type' : 'timestep' }
+        possible_values['end_before']   = { 'display_name' : 'Ending Time',
+                                            'values' : list(range(0, 25)),
+                                            'type' : 'timestep' }
 
         self.writeOnFileConfigurationForWebServer(possible_values)
 
