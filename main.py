@@ -102,6 +102,8 @@ if agent:
                     t._stop()
                     agent.debug("Stop del thread start")
                     break
+            else:
+                break
 
         #agent.start()
         time.sleep(5.0)
