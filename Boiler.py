@@ -88,11 +88,11 @@ class Boiler(Agent):
     def generateConfigurationForWebServer(self):
         possible_values = {}
         possible_values['start_after']  = { 'display_name' : 'Starting Time',
-                                            'values' : list(range(0, 25)),
+                                            'values' : list(range(0, consts.kTIME_SLOTS)),
                                             'type' : 'timestep'}
 
         possible_values['end_before']   = { 'display_name' : 'Ending Time',
-                                            'values' : list(range(0, 25)),
+                                            'values' : list(range(0, consts.kTIME_SLOTS)),
                                             'type' : 'timestep' }
 
         possible_values['initial_qty']  = {'display_name': 'Initial Quantity',

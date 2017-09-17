@@ -79,10 +79,10 @@ class WashingMachine(Agent):
                                             'values' : ['COTTON_30', 'COTTON_60'],
                                             'type' : 'select' }
         possible_values['start_after']  = { 'display_name' : 'Starting Time',
-                                            'values' : list(range(0, 25)),
+                                            'values' : list(range(0, consts.kTIME_SLOTS)),
                                             'type' : 'timestep' }
         possible_values['end_before']   = { 'display_name' : 'Ending Time',
-                                            'values' : list(range(0, 25)),
+                                            'values' : list(range(0, consts.kTIME_SLOTS)),
                                             'type' : 'timestep' }
 
         self.writeOnFileConfigurationForWebServer(possible_values)
