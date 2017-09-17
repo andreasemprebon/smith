@@ -18,6 +18,9 @@ class Boiler(Agent):
         # Per il PoliMi consuma 194, quindi si imposta 194 W
         self.power_when_on = 194  # W
 
+        # Genero il file JSON con tutte le possibilita' per il configuratore Web
+        self.generateConfigurationForWebServer()
+
     # Imposta la quantità di acqua calda presente nel boiler
     def setQty(self, val):
         qty = max(val, self.min_qty)

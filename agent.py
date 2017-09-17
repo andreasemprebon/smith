@@ -134,9 +134,6 @@ class Agent:
             self.readAnnouncementThread.start()
             self.replyToRequestFromWebServerThread.start()
 
-            # Genero il file JSON con tutte le possibilita' per il configuratore Web
-            self.generateConfigurationForWebServer()
-
     def getIPAddress(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))

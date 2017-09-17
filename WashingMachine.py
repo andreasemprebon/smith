@@ -21,6 +21,9 @@ class WashingMachine(Agent):
         self.timeToStartAfter   = None
         self.cycle              = WashingMachineCycle.COTTON_60
 
+        # Genero il file JSON con tutte le possibilita' per il configuratore Web
+        self.generateConfigurationForWebServer()
+
     def getCycle(self):
         return self.cycle['power']
 
@@ -79,7 +82,6 @@ class WashingMachine(Agent):
         self.writeOnFileConfigurationForWebServer(possible_values)
 
     def readAgentConfigurationFromWebServer(self):
-        return
         super().readAgentConfigurationFromWebServer()
 
         if self.jsonConfiguration is not None:
