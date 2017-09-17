@@ -19,6 +19,7 @@ class DiscoveredAgent:
         self.port   = port
         self.domain = None
         self.varsFromStartingPoint = None
+        self.timeOfDiscovery = time.time()
 
         self.optimizableAgent      = True
         self.isProducingPower      = False
@@ -195,7 +196,7 @@ class Agent:
         while (True):
             myself.debug("Annuncio agente {} - {}".format(myself.id, myself.host))
             sock.sendto(pdata, (myself.broadcast_addr, myself.broadcast_port) )
-            time.sleep(5)
+            time.sleep(2)
 
         sock.close()
 
@@ -233,8 +234,37 @@ class Agent:
                     self.addNewDiscoveredAgent(agent_id, agent_addr, agent_port,
                                                isProducingPower = agent_prod_power,
                                                optimizableAgent = agent_optimizable)
+            # Se l'agente è già presente nella mia lista, aggiorno il fatto che sia ancora vivo
+            else:
+                self.otherAgents[agent_id].timeOfDiscovery = time.time()
+
 
         listening_socket.close()
+
+    def removeOldDiscoveredAgent(self):
+        removed = False
+        for index in range(0, len(self.otherAgents.keys())):
+            id = self.otherAgents.keys()[index]
+            a = self.otherAgents[id]
+            if abs(time.time() - a.timeOfDiscovery) > 10:
+                self.debug("Rimuovo {}".format(id))
+                del self.otherAgents[id]
+                index = 0
+                removed = True
+
+        if not removed:
+            return False
+
+        # Re-imposto la root
+        self.isRoot = True
+        self.rootID = self.id
+        for id in self.otherAgents:
+            if id < self.id:
+                self.isRoot = False
+            self.rootID = min(self.rootID, id)
+
+        return True
+
 
     def addNewDiscoveredAgent(self, id, addr, port, isProducingPower = False, optimizableAgent = True):
         discovered = DiscoveredAgent(id, addr, port)
@@ -254,7 +284,7 @@ class Agent:
             #print(data)
 
             if self.value is not None:
-                start_timestep = self.value
+                start_timestep = int(self.value)
             else:
                 start_timestep = 0
             cycle = self.getCycle()
@@ -389,6 +419,9 @@ class Agent:
             self.debug("Sono l'unico agente sulla rete, non posso ottimizzare nulla.")
             return False
 
+        # Rimuovo tutti gli agenti che non vengono annunciato da alcuni secondi
+        self.removeOldDiscoveredAgent()
+
         self.listenToMessagesThread = threading.Thread(name='ListenToMessages-Thread-of-Agent-' + str(self.id),
                                                        target=self.listenToMessages
                                                        )
@@ -409,8 +442,7 @@ class Agent:
         # Avvio la procedura di propagazione dei messaggi di UTIL
         UTILMessagePropagation.start( self )
 
-        # Solamente gli agenti NON root devono attendere il messaggio di VALUE
-        # dal loro genitore
+        # Solamente gli agenti NON root devono attendere il messaggio di VALUE dal loro genitore
         if not self.isRoot:
             VALUEMessagePropagation.start( self )
 

@@ -1,8 +1,8 @@
 import os
 import socket
-import random
 import time
 import cost
+import threading
 
 """
 WASHING MACHINE
@@ -90,7 +90,20 @@ else:
 # Se ho un agente impostato, ogni 5 secondi avvio una ottimizzazione
 if agent:
     while (True):
-        agent.start()
+        t = threading.Thread( target=agent.start )
+        t.setDaemon(True)
+        t.start()
+
+        while (True):
+            t.join(timeout = 5)
+            if t.is_alive():
+                if agent.removeOldDiscoveredAgent():
+                    #agent.killStartThread = True
+                    t._stop()
+                    agent.debug("Stop del thread start")
+                    break
+
+        #agent.start()
         time.sleep(5.0)
 else:
     print("Nessun agente impostato. Esco.")
