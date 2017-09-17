@@ -312,7 +312,7 @@ class Agent:
         web_sock.close()
 
     def readAgentConfigurationFromWebServer(self):
-        content_folder = os.path.join("/", "var", "www", "html")
+        content_folder = os.path.join("/", "var", "www", "html", "api")
         conf_file = os.path.join(content_folder, "conf.json")
 
         with open(conf_file) as data_file:
@@ -322,7 +322,7 @@ class Agent:
                 self.debug("Errore nella lettura del file di configurazione web")
 
     def writeOnFileConfigurationForWebServer(self, possible_conf):
-        content_folder = os.path.join("/", "var", "www", "html")
+        content_folder = os.path.join("/", "var", "www", "html", "api")
         poss_conf_file = os.path.join(content_folder, "possible_conf.json")
 
         with open(poss_conf_file, 'w') as outfile:
