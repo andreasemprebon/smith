@@ -74,15 +74,41 @@ class WashingMachine(Agent):
         self.timeToStartAfter = None
 
     def generateConfigurationForWebServer(self):
+        current_cycle_name = ""
+        cycles = [name for name, value in vars(WashingMachineCycle).items() if not name.startswith('_')]
+        for c in cycles:
+            if self.cycle['name'] == getattr(WashingMachineCycle, c)['name']:
+                current_cycle_name = c
+                break
+
+        possible_values = {}
+        possible_values['cycle']        = { 'display_name' : 'Cycle',
+                                            'values' : ['COTTON_30', 'COTTON_60'],
+                                            'current' : current_cycle_name,
+                                            'type' : 'select' }
+
+        possible_values['start_after']  = { 'display_name' : 'Starting Time',
+                                            'values' : list(range(0, consts.kTIME_SLOTS+1)),
+                                            'current' : self.timeToStartAfter,
+                                            'type' : 'timestep' }
+
+        possible_values['end_before']   = { 'display_name' : 'Ending Time',
+                                            'values' : list(range(0, consts.kTIME_SLOTS+1)),
+                                            'current' : self.timeToEndBefore,
+                                            'type' : 'timestep' }
+
+        self.writeOnFileConfigurationForWebServer(possible_values)
+
+    def currentAgentConfigurationForWebServer(self):
         possible_values = {}
         possible_values['cycle']        = { 'display_name' : 'Cycle',
                                             'values' : ['COTTON_30', 'COTTON_60'],
                                             'type' : 'select' }
         possible_values['start_after']  = { 'display_name' : 'Starting Time',
-                                            'values' : list(range(0, consts.kTIME_SLOTS)),
+                                            'values' : list(range(0, consts.kTIME_SLOTS+1)),
                                             'type' : 'timestep' }
         possible_values['end_before']   = { 'display_name' : 'Ending Time',
-                                            'values' : list(range(0, consts.kTIME_SLOTS)),
+                                            'values' : list(range(0, consts.kTIME_SLOTS+1)),
                                             'type' : 'timestep' }
 
         self.writeOnFileConfigurationForWebServer(possible_values)
@@ -93,9 +119,12 @@ class WashingMachine(Agent):
         if self.jsonConfiguration is not None:
             if "cycle" in self.jsonConfiguration:
                 self.cycle = getattr(WashingMachineCycle, str(self.jsonConfiguration['cycle']) )
+                self.debug("Ciclo impostato a {}".format(str(self.jsonConfiguration['cycle'])))
 
             if "end_before" in self.jsonConfiguration:
                 self.endsBefore( int(self.jsonConfiguration["end_before"]) )
+                self.debug("Ends before {}".format( int(self.jsonConfiguration["end_before"])) )
 
             if "start_after" in self.jsonConfiguration:
                 self.startAfter( int(self.jsonConfiguration["start_after"]) )
+                self.debug("Start after {}".format(int(self.jsonConfiguration["end_before"])) )

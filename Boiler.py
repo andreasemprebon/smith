@@ -87,20 +87,24 @@ class Boiler(Agent):
 
     def generateConfigurationForWebServer(self):
         possible_values = {}
-        possible_values['start_after']  = { 'display_name' : 'Starting Time',
-                                            'values' : list(range(0, consts.kTIME_SLOTS)),
-                                            'type' : 'timestep'}
+        possible_values['start_after'] = {'display_name': 'Starting Time',
+                                          'values'      : list(range(0, consts.kTIME_SLOTS + 1)),
+                                          'current'     : self.timeToStartAfter,
+                                          'type'        : 'timestep'}
 
-        possible_values['end_before']   = { 'display_name' : 'Ending Time',
-                                            'values' : list(range(0, consts.kTIME_SLOTS)),
-                                            'type' : 'timestep' }
+        possible_values['end_before'] = {'display_name': 'Ending Time',
+                                         'values'      : list(range(0, consts.kTIME_SLOTS + 1)),
+                                         'current'     : self.timeToEndBefore,
+                                         'type'        : 'timestep'}
 
-        possible_values['initial_qty']  = {'display_name': 'Initial Quantity',
-                                           'values' : list(range(0, self.max_qty+1)),
+        possible_values['initial_qty']  = { 'display_name': 'Initial Quantity',
+                                            'values' : list(range(0, self.max_qty+1)),
+                                            'current': self.qty,
                                             'type' : 'integer'}
 
-        possible_values['target_qty'] = {'display_name': 'Target Quantity',
-                                         'values' : list(range(0, self.max_qty + 1)),
+        possible_values['target_qty'] = {   'display_name': 'Target Quantity',
+                                            'values' : list(range(0, self.max_qty + 1)),
+                                            'current': self.target_qty,
                                             'type' : 'integer'}
 
         self.writeOnFileConfigurationForWebServer(possible_values)
