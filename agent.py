@@ -77,7 +77,7 @@ class Agent:
                 line = line.decode("utf-8")
                 if line[:5] == "ESSID":
                     ssid = line.split('"')[1]
-                    if ssid == "FASTWEB-1-AF8BCD":
+                    if ssid == "FASTWEB-1-AF8BCD" or ssid == "FASTWEB-1-0021965C8A34":
                         print("Collegato alla rete {}".format(ssid))
                         waitingForWiFi = False
                         break
