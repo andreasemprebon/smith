@@ -92,7 +92,7 @@ class Boiler(Agent):
 
         possible_values['initial_qty']  = {'display_name': 'Initial Quantity',
                                            'values' : list(range(0, self.max_qty+1))}
-        
+
         possible_values['target_qty'] = {'display_name': 'Target Quantity',
                                          'values' : list(range(0, self.max_qty + 1))}
 
