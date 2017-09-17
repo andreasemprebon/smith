@@ -85,6 +85,8 @@ class SolarPanel(Agent):
             "ip"   : self.host
         }
 
+        self.debug(data)
+
         return data
 
     def generateConfigurationForWebServer(self):
