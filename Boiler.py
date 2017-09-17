@@ -81,3 +81,42 @@ class Boiler(Agent):
 
     def removeTimeToStartAfter(self):
         self.timeToStartAfter = None
+
+    def generateConfigurationForWebServer(self):
+        possible_values = {}
+        possible_values['start_after']  = { 'display_name' : 'Starting Time',
+                                            'values' : list(range(0, 25)) }
+
+        possible_values['end_before']   = { 'display_name' : 'Ending Time',
+                                            'values' : list(range(0, 25)) }
+
+        possible_values['initial_qty']  = {'display_name': 'Initial Quantity',
+                                           'values' : list(range(0, self.max_qty+1))}
+        
+        possible_values['target_qty'] = {'display_name': 'Target Quantity',
+                                         'values' : list(range(0, self.max_qty + 1))}
+
+        self.writeOnFileConfigurationForWebServer(possible_values)
+
+    def readAgentConfigurationFromWebServer(self):
+        super().readAgentConfigurationFromWebServer()
+
+        if self.jsonConfiguration is not None:
+
+            if "end_before" in self.jsonConfiguration:
+                self.endsBefore( int(self.jsonConfiguration["end_before"]) )
+
+            if "start_after" in self.jsonConfiguration:
+                self.startAfter( int(self.jsonConfiguration["start_after"]) )
+
+            if "initial_qty" in self.jsonConfiguration:
+                self.setQty( int(self.jsonConfiguration["initial_qty"]) )
+
+            if "max_qty" in self.jsonConfiguration:
+                self.max_qty = int( self.jsonConfiguration["max_qty"] )
+
+            if "target_qty" in self.jsonConfiguration:
+                self.target_qty = int( self.jsonConfiguration["target_qty"] )
+
+            if "power_when_on" in self.jsonConfiguration:
+                self.power_when_on = int( self.jsonConfiguration["power_when_on"] )

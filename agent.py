@@ -81,7 +81,8 @@ class Agent:
 
         self.port = port
 
-        self.killStartThread = False
+        self.killStartThread    = False
+        self.jsonConfiguration  = None
 
         # Variabili Agente
         self.name               = "Agent"
@@ -132,6 +133,9 @@ class Agent:
             self.annouceThread.start()
             self.readAnnouncementThread.start()
             self.replyToRequestFromWebServerThread.start()
+
+            # Genero il file JSON con tutte le possibilita' per il configuratore Web
+            self.generateConfigurationForWebServer()
 
     def getIPAddress(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -307,6 +311,20 @@ class Agent:
 
         web_sock.close()
 
+    def readAgentConfigurationFromWebServer(self):
+        content_folder = os.path.join("var", "www", "html")
+        conf_file = os.path.join(content_folder, "conf.json")
+
+        with open(conf_file) as data_file:
+            self.jsonConfiguration = json.load(data_file)
+
+    def writeOnFileConfigurationForWebServer(self, possible_conf):
+        content_folder = os.path.join("var", "www", "html")
+        poss_conf_file = os.path.join(content_folder, "possible_conf.json")
+
+        with open(poss_conf_file, 'w') as outfile:
+            json.dump(possible_conf, outfile)
+
     """
     Invia i messaggi tramite il protocollo TCP/IP:
         dest_node_id:   id nodo dell'Agente destinatario
@@ -410,10 +428,6 @@ class Agent:
         filename_path = os.path.join(output_folder, '{}_{}_cycle.csv'.format(self.name, self.id))
 
         np.savetxt(filename_path, np.array( cycle ), fmt='%.2f', delimiter=',')
-
-    def saveAgentJSONDescriptionForWeb(self):
-        dir = os.path.dirname(__file__)
-        output_folder = os.path.join(dir, "..", "shared_resources")
 
     def debug(self, text):
         print("[{} {}]: {}".format(self.name, self.id, text))

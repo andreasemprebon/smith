@@ -1,6 +1,7 @@
 from agent import Agent
 import constants as consts
 import numpy as np
+import json
 
 class WashingMachineCycle():
     COTTON_60 = {
@@ -69,3 +70,25 @@ class WashingMachine(Agent):
 
     def removeTimeToStartAfter(self):
         self.timeToStartAfter = None
+
+    def generateConfigurationForWebServer(self):
+        possible_values = {}
+        possible_values['cycle']        = { 'display_name' : 'Cycle', 'values' : ['COTTON_30', 'COTTON_60'] }
+        possible_values['start_after']  = { 'display_name' : 'Starting Time', 'values' : list(range(0, 25)) }
+        possible_values['end_before']   = { 'display_name' : 'Ending Time', 'values' : list(range(0, 25)) }
+
+        self.writeOnFileConfigurationForWebServer(possible_values)
+
+    def readAgentConfigurationFromWebServer(self):
+        super().readAgentConfigurationFromWebServer()
+
+        if self.jsonConfiguration is not None:
+
+            if "cycle" in self.jsonConfiguration:
+                self.cycle = getattr(WashingMachineCycle, str(self.jsonConfiguration['cycle']) )
+
+            if "end_before" in self.jsonConfiguration:
+                self.endsBefore( int(self.jsonConfiguration["end_before"]) )
+
+            if "start_after" in self.jsonConfiguration:
+                self.startAfter( int(self.jsonConfiguration["start_after"]) )
