@@ -243,8 +243,10 @@ class Agent:
 
     def removeOldDiscoveredAgent(self):
         removed = False
-        for index in range(0, len(self.otherAgents.keys())):
-            id = self.otherAgents.keys()[index]
+
+        for index in range(0, len(list(self.otherAgents.keys()))):
+            keys = list(self.otherAgents.keys())
+            id = keys[index]
             a = self.otherAgents[id]
             if abs(time.time() - a.timeOfDiscovery) > 10:
                 self.debug("Rimuovo {}".format(id))
