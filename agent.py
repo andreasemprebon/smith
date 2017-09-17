@@ -315,11 +315,13 @@ class Agent:
         content_folder = os.path.join("/", "var", "www", "html", "api")
         conf_file = os.path.join(content_folder, "conf.json")
 
-        with open(conf_file) as data_file:
-            try:
+        try:
+            with open(conf_file) as data_file:
                 self.jsonConfiguration = json.load(data_file)
-            except json.JSONDecodeError:
-                self.debug("Errore nella lettura del file di configurazione web")
+        except FileNotFoundError:
+            self.debug("Impossibile trovare il file di configurazione web")
+        except json.JSONDecodeError:
+            self.debug("Errore JSON nella lettura del file di configurazione web")
 
     def writeOnFileConfigurationForWebServer(self, possible_conf):
         content_folder = os.path.join("/", "var", "www", "html", "api")
