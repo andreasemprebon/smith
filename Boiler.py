@@ -69,6 +69,9 @@ class Boiler(Agent):
     def endsBefore(self, time):
         if (time >= consts.kTIME_SLOTS):
             return False
+        if (time <= 0):
+            return False
+        
         self.timeToEndBefore = time
 
     def startAfter(self, time):
