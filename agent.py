@@ -254,8 +254,8 @@ class Agent:
             if abs(time.time() - a.timeOfDiscovery) > 10:
                 self.debug("Rimuovo {}".format(id))
                 del self.otherAgents[id]
-                index = 0
                 removed = True
+                break
 
         if not removed:
             return False
@@ -432,7 +432,8 @@ class Agent:
         self.killStartThread = False
 
         # Rimuovo tutti gli agenti che non vengono annunciato da alcuni secondi
-        self.removeOldDiscoveredAgent()
+        while self.removeOldDiscoveredAgent():
+            pass
 
         self.listenToMessagesThread = threading.Thread(name='ListenToMessages-Thread-of-Agent-' + str(self.id),
                                                        target=self.listenToMessages
