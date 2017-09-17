@@ -87,6 +87,14 @@ else:
     agent_id = 99
     agent =  WashingMachine(agent_id, range(0, 96), 12345)
 
+# Elimina il file di configurazione WEB
+try:
+    content_folder = os.path.join("/", "var", "www", "html", "api")
+    conf_file = os.path.join(content_folder, "conf.json")
+    os.unlink(conf_file)
+except:
+    pass
+
 # Se ho un agente impostato, ogni 5 secondi avvio una ottimizzazione
 if agent:
     while (True):

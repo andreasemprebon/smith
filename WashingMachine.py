@@ -87,14 +87,22 @@ class WashingMachine(Agent):
                                             'current' : current_cycle_name,
                                             'type' : 'select' }
 
+        curr_timeToStartAfter = self.timeToStartAfter
+        if curr_timeToStartAfter is None:
+            curr_timeToStartAfter = 0
+
         possible_values['start_after']  = { 'display_name' : 'Starting Time',
                                             'values' : list(range(0, consts.kTIME_SLOTS+1)),
-                                            'current' : self.timeToStartAfter,
+                                            'current' : curr_timeToStartAfter,
                                             'type' : 'timestep' }
+
+        curr_timeToEndBefore = self.timeToEndBefore
+        if curr_timeToEndBefore is None:
+            curr_timeToEndBefore = consts.kTIME_SLOTS
 
         possible_values['end_before']   = { 'display_name' : 'Ending Time',
                                             'values' : list(range(0, consts.kTIME_SLOTS+1)),
-                                            'current' : self.timeToEndBefore,
+                                            'current' : curr_timeToEndBefore,
                                             'type' : 'timestep' }
 
         self.writeOnFileConfigurationForWebServer(possible_values)
@@ -123,8 +131,8 @@ class WashingMachine(Agent):
 
             if "end_before" in self.jsonConfiguration:
                 self.endsBefore( int(self.jsonConfiguration["end_before"]) )
-                self.debug("Ends before {}".format( int(self.jsonConfiguration["end_before"])) )
+                self.debug("Ends before {}".format( self.timeToEndBefore ))
 
             if "start_after" in self.jsonConfiguration:
                 self.startAfter( int(self.jsonConfiguration["start_after"]) )
-                self.debug("Start after {}".format(int(self.jsonConfiguration["end_before"])) )
+                self.debug("Start after {}".format( self.timeToStartAfter ))
