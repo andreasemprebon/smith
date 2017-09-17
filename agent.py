@@ -78,6 +78,7 @@ class Agent:
                 if line[:5] == "ESSID":
                     ssid = line.split('"')[1]
                     if ssid == "FASTWEB-1-AF8BCD":
+                        print("Collegato alla rete {}".format(ssid))
                         waitingForWiFi = False
                         break
             time.sleep(1.0)
