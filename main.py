@@ -90,7 +90,7 @@ else:
 # Se ho un agente impostato, ogni 5 secondi avvio una ottimizzazione
 if agent:
     while (True):
-
+        agent.generateConfigurationForWebServer()
         agent.readAgentConfigurationFromWebServer()
 
         t = threading.Thread( target=agent.start )

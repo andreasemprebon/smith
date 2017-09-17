@@ -98,7 +98,7 @@ class Boiler(Agent):
                                          'type'        : 'timestep'}
 
         possible_values['initial_qty']  = { 'display_name': 'Initial Quantity',
-                                            'values' : list(range(0, self.max_qty+1)),
+                                            'values' : list(range(0, self.max_qty + 1)),
                                             'current': self.qty,
                                             'type' : 'integer'}
 
