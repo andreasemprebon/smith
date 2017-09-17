@@ -52,14 +52,14 @@ class DishWasher(Agent):
                     'vars'      : np.array(vars) }
 
     def endsBefore(self, time):
-        if (time >= consts.kTIME_SLOTS):
+        if (time > consts.kTIME_SLOTS):
             return False
         self.timeToEndBefore = time
 
     def startAfter(self, time):
         if (time >= consts.kTIME_SLOTS):
             return False
-        if (time <= 0):
+        if (time < 0):
             return False
 
         self.timeToStartAfter = time
