@@ -1,7 +1,6 @@
 from agent import Agent
 import constants as consts
 import numpy as np
-import json
 
 class WashingMachineCycle():
     COTTON_60 = {
@@ -80,11 +79,10 @@ class WashingMachine(Agent):
         self.writeOnFileConfigurationForWebServer(possible_values)
 
     def readAgentConfigurationFromWebServer(self):
+        return
         super().readAgentConfigurationFromWebServer()
 
         if self.jsonConfiguration is not None:
-            self.debug("FIGOOOOOOOOOO")
-            self.debug(self.jsonConfiguration)
             if "cycle" in self.jsonConfiguration:
                 self.cycle = getattr(WashingMachineCycle, str(self.jsonConfiguration['cycle']) )
 
