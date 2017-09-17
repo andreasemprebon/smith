@@ -85,6 +85,7 @@ class SolarPanel(Agent):
             "ip"   : self.host
         }
 
+        self.debug(cycle)
         self.debug(data)
 
         return data
