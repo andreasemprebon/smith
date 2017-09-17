@@ -11,6 +11,7 @@ import constants as consts
 import os
 import sys
 import json
+from subprocess import check_output
 
 class DiscoveredAgent:
     def __init__(self, id, addr, port):
@@ -66,6 +67,21 @@ class DiscoveredAgent:
 
 class Agent:
     def __init__(self, i, domain, port, simulation = False):
+        # Attendo di essere connesso ad una rete Wireless nota
+        waitingForWiFi = True
+        while (waitingForWiFi):
+            print("In attesa di collegamento alla rete...")
+            scanoutput = check_output(["iwlist", "wlan0", "scan"])
+
+            for line in scanoutput.split():
+                line = line.decode("utf-8")
+                if line[:5] == "ESSID":
+                    ssid = line.split('"')[1]
+                    if ssid == "FASTWEB-1-AF8BCD":
+                        waitingForWiFi = False
+                        break
+            time.sleep(1.0)
+
         # Informazioni per la comunicazione
 
         # Broadcast
