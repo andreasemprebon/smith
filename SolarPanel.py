@@ -12,6 +12,7 @@ class SolarPanel(Agent):
     def __init__(self, id, addr, port, simulation = False):
         super().__init__(id, addr, port, simulation)
         self.name = "SolarPanel"
+        self.cycle = np.zeros(consts.kTIME_SLOTS)
 
         self.radiation_type = SolarPanelRadiation.MEDIUM
 
