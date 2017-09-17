@@ -60,3 +60,10 @@ class SolarPanel(Agent):
 
         return {'status': True,
                 'vars'  : np.array(vars)}
+
+    def generateConfigurationForWebServer(self):
+        possible_values = {}
+        self.writeOnFileConfigurationForWebServer(possible_values)
+
+    def readAgentConfigurationFromWebServer(self):
+        super().readAgentConfigurationFromWebServer()

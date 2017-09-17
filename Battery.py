@@ -133,3 +133,20 @@ class Battery(Agent):
 
         np.savetxt(charge_value_filename_path,  np.array(charge_value), fmt='%i', delimiter=',')
         np.savetxt(charge_perc_filename_path,   np.array(charge_perc), fmt='%i', delimiter=',')
+
+    def generateConfigurationForWebServer(self):
+        possible_values = {}
+        self.writeOnFileConfigurationForWebServer(possible_values)
+
+    def readAgentConfigurationFromWebServer(self):
+        super().readAgentConfigurationFromWebServer()
+
+        if self.jsonConfiguration is not None:
+            if "max_capacity" in self.jsonConfiguration:
+                self.max_capacity = int(self.jsonConfiguration["max_capacity"])
+
+            if "charge" in self.jsonConfiguration:
+                self.charge = int( self.jsonConfiguration["charge"] )
+
+            if "max_power" in self.jsonConfiguration:
+                self.setMaxPower(int( self.jsonConfiguration["max_power"] ))

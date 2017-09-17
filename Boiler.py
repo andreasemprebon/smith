@@ -71,7 +71,7 @@ class Boiler(Agent):
             return False
         if (time <= 0):
             return False
-        
+
         self.timeToEndBefore = time
 
     def startAfter(self, time):

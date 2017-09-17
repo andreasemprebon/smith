@@ -69,3 +69,53 @@ class DishWasher(Agent):
 
     def removeTimeToStartAfter(self):
         self.timeToStartAfter = None
+
+    def generateConfigurationForWebServer(self):
+        current_cycle_name = ""
+        cycles = [name for name, value in vars(DishWasherCycle).items() if not name.startswith('_')]
+        for c in cycles:
+            if self.cycle['name'] == getattr(DishWasherCycle, c)['name']:
+                current_cycle_name = c
+                break
+
+        possible_values = {}
+        possible_values['cycle']        = { 'display_name' : 'Cycle',
+                                            'values' : ['ECO', 'VERY_DIRTY'],
+                                            'current' : current_cycle_name,
+                                            'type' : 'select' }
+
+        curr_timeToStartAfter = self.timeToStartAfter
+        if curr_timeToStartAfter is None:
+            curr_timeToStartAfter = 0
+
+        possible_values['start_after']  = { 'display_name' : 'Starting Time',
+                                            'values' : list(range(0, consts.kTIME_SLOTS+1)),
+                                            'current' : curr_timeToStartAfter,
+                                            'type' : 'timestep' }
+
+        curr_timeToEndBefore = self.timeToEndBefore
+        if curr_timeToEndBefore is None:
+            curr_timeToEndBefore = consts.kTIME_SLOTS
+
+        possible_values['end_before']   = { 'display_name' : 'Ending Time',
+                                            'values' : list(range(0, consts.kTIME_SLOTS+1)),
+                                            'current' : curr_timeToEndBefore,
+                                            'type' : 'timestep' }
+
+        self.writeOnFileConfigurationForWebServer(possible_values)
+
+    def readAgentConfigurationFromWebServer(self):
+        super().readAgentConfigurationFromWebServer()
+
+        if self.jsonConfiguration is not None:
+            if "cycle" in self.jsonConfiguration:
+                self.cycle = getattr(DishWasherCycle, str(self.jsonConfiguration['cycle']) )
+                self.debug("Ciclo impostato a {}".format(str(self.jsonConfiguration['cycle'])))
+
+            if "end_before" in self.jsonConfiguration:
+                self.endsBefore( int(self.jsonConfiguration["end_before"]) )
+                self.debug("Ends before {}".format( self.timeToEndBefore ))
+
+            if "start_after" in self.jsonConfiguration:
+                self.startAfter( int(self.jsonConfiguration["start_after"]) )
+                self.debug("Start after {}".format( self.timeToStartAfter ))
