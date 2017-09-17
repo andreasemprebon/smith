@@ -3,6 +3,9 @@ from message import MessageType as msgType
 import dfsPseudotree as dfs
 
 def start( agent ):
+    if agent.killStartThread:
+        return False
+
     agent.debug("Starting pseudotree_creation...")
 
     # Attendo finche' l'agente non e' disponibile per ascoltare
@@ -20,6 +23,8 @@ def start( agent ):
         # Attendo che tutti i miei vicini mi mandino la lista
         # dei loro vicini
         while True:
+            if agent.killStartThread:
+                return False
             all_neighbor_msgs_arrived = True
             time.sleep(0.5)
             for id in agent.otherAgents:
@@ -103,6 +108,8 @@ def start( agent ):
 
         # Aspetto che mi arrivi il dominio da tutti i miei parent e pseudo_parents
         while True:
+            if agent.killStartThread:
+                return False
             all_parents_msgs_arrived = True
             time.sleep(0.5)
 

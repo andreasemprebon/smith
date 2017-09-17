@@ -68,6 +68,9 @@ class Battery(Agent):
         # Attendo il ciclo di tutti gli altri agenti coinvolti
         start_time = time.time()
         while True:
+            if self.killStartThread:
+                return False
+
             all_other_agents_cycle_msg_arrived = True
             time.sleep(0.5)
             for id in self.otherAgents:

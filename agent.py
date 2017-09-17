@@ -81,6 +81,8 @@ class Agent:
 
         self.port = port
 
+        self.killStartThread = False
+
         # Variabili Agente
         self.name               = "Agent"
         self.isListening        = False
@@ -421,6 +423,8 @@ class Agent:
             self.debug("Sono l'unico agente sulla rete, non posso ottimizzare nulla.")
             return False
 
+        self.killStartThread = False
+
         # Rimuovo tutti gli agenti che non vengono annunciato da alcuni secondi
         self.removeOldDiscoveredAgent()
 
@@ -438,21 +442,34 @@ class Agent:
         # Avvio la procedura per la creazione dello pseudo-tree
         pseudoTreeGeneration.start( self )
 
+        if self.killStartThread:
+            return False
+
         # Resetto il contenuto del dict messaggi
         self.msgs = {}
 
         # Avvio la procedura di propagazione dei messaggi di UTIL
         UTILMessagePropagation.start( self )
+        if self.killStartThread:
+            return False
 
         # Solamente gli agenti NON root devono attendere il messaggio di VALUE dal loro genitore
         if not self.isRoot:
             VALUEMessagePropagation.start( self )
 
+        if self.killStartThread:
+            return False
+
         # Alla fine dell'intera procedura calcolo il mio ciclo finale
         self.computeFinalCycle()
 
+        if self.killStartThread:
+            return False
+
         if not self.optimizableAgent:
             self.waitOptimizationEnd()
+            if self.killStartThread:
+                return False
 
         self.printPerformace()
 

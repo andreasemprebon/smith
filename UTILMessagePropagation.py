@@ -5,6 +5,9 @@ import relations
 import constants as consts
 
 def start( agent ):
+    if agent.killStartThread:
+        return False
+
     agent.debug("Starting UTIL Message propagation...")
 
     if agent.isLeaf():
@@ -46,6 +49,9 @@ def start( agent ):
 
         # Attendo che arrivino tutti i messaggi dai figli (solamente children, NON pseudo-children)
         while True:
+            if agent.killStartThread:
+                return False
+
             all_children_msgs_arrived = True
             time.sleep(0.5)
             for id in agent.c:
@@ -59,6 +65,9 @@ def start( agent ):
         # Attendo che i messaggi con gli agenti già considerati per tutti gli agenti
         # che producono potenza
         while True:
+            if agent.killStartThread:
+                return False
+
             all_children_msgs_arrived = True
             time.sleep(0.5)
             agent.debug("Attendo informazioni su chi produce")

@@ -4,9 +4,15 @@ import constants as consts
 from message import MessageType as msgType
 
 def start(agent):
+    if agent.killStartThread:
+        return False
+
     parent_value = None
 
     while True:
+        if agent.killStartThread:
+            return False
+
         util_msg_recieved = False
         for msg_key in agent.msgs:
             # sender_id   = msg_key[0]

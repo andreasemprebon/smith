@@ -98,10 +98,8 @@ if agent:
             t.join(timeout = 5)
             if t.is_alive():
                 if agent.removeOldDiscoveredAgent():
-                    #agent.killStartThread = True
-                    t._stop()
+                    agent.killStartThread = True
                     agent.debug("Stop del thread start")
-                    break
             else:
                 break
 
