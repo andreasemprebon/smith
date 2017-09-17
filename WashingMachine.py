@@ -83,7 +83,8 @@ class WashingMachine(Agent):
         super().readAgentConfigurationFromWebServer()
 
         if self.jsonConfiguration is not None:
-
+            self.debug("FIGOOOOOOOOOO")
+            self.debug(self.jsonConfiguration)
             if "cycle" in self.jsonConfiguration:
                 self.cycle = getattr(WashingMachineCycle, str(self.jsonConfiguration['cycle']) )
 
