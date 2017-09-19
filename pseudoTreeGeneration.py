@@ -11,6 +11,8 @@ def start( agent ):
     # Attendo finche' l'agente non e' disponibile per ascoltare
     # i messaggi in arrivo
     while ( not agent.isListening ):
+        if agent.killStartThread:
+            return False
         time.sleep(0.5)
 
     agent.debug("Ready to start pseudotree creation")
@@ -89,6 +91,8 @@ def start( agent ):
 
         count = 0
         while key_msg_ptinfo not in agent.msgs:
+            if agent.killStartThread:
+                return False
             time.sleep(0.5)
             count += 1
             if count > 5:
