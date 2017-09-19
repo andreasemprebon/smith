@@ -257,6 +257,8 @@ class Agent:
                 # Se l'agente è già presente nella mia lista, aggiorno il fatto che sia ancora vivo
                 else:
                     self.otherAgents[agent_id].timeOfDiscovery = time.time()
+                    self.otherAgents[agent_id].isProducingPower = agent_prod_power
+                    self.otherAgents[agent_id].optimizableAgent = agent_optimizable
 
 
         listening_socket.close()
