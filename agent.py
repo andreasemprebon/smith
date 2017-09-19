@@ -347,13 +347,8 @@ class Agent:
     """
     def sendMsg(self, dest_node_id, type, data, ):
         #self.debug("[INVIO] {} -> {}: {} {}".format(self.id, dest_node_id, type, data))
-        try:
-            sender_id = self.id
-            pdata = pickle.dumps( (sender_id, type, data) )
-        except:
-            self.debug("Errore in sendMsg")
-            self.killStartThread = True
-            return False
+
+        pdata = pickle.dumps( ( self.id, type, data) )
 
         dest = self.otherAgents[ dest_node_id ]
 
