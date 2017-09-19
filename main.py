@@ -118,6 +118,7 @@ if agent:
                     agent.killStartThread = True
                     agent.debug("Stop del thread start")
             else:
+                agent.debug("Thread start terminato")
                 break
 
         #agent.start()
