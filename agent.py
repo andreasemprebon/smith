@@ -429,6 +429,7 @@ class Agent:
         for id in self.otherAgents:
             a = self.otherAgents[id]
             if not a.optimizableAgent:
+                self.debug("Comunico ciclo a " + id)
                 self.sendMsg(id, message.MessageType.FINAL_CYCLE, cycle)
 
     def saveFinalCycle(self, cycle):
