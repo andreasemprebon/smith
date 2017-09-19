@@ -83,11 +83,16 @@ class WashingMachine(Agent):
             start_timestep = 0
         cycle = self.getCycle()
 
+        cycle_length = len(cycle)
+        sending_cycle = [0] * consts.kTIME_SLOTS
+        sending_cycle[start_timestep:cycle_length + start_timestep] = cycle
+
         data = {
             "name" : self.name,
             "id"   : self.id,
             "start": start_timestep,
-            "end"  : start_timestep + len(cycle),
+            "end"  : start_timestep + cycle_length,
+            "cycle": list(sending_cycle),
             "ip"   : self.host
         }
 

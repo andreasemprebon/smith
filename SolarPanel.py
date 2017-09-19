@@ -78,12 +78,15 @@ class SolarPanel(Agent):
                 end_timestep = index
                 break
 
+        sending_cycle = np.absolute(cycle)
+
         data = {
-            "name" : self.name,
-            "id"   : self.id,
-            "start": start_timestep,
-            "end"  : end_timestep,
-            "ip"   : self.host
+            "name"  : self.name,
+            "id"    : self.id,
+            "start" : start_timestep,
+            "end"   : end_timestep,
+            "cycle" : list(sending_cycle),
+            "ip"    : self.host
         }
 
 

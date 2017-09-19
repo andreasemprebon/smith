@@ -121,6 +121,7 @@ class Battery(Agent):
             charge_value.append(self.charge)
             charge_perc.append(self.charge / self.max_capacity * 100)
 
+        self.cycle = finale_cycle
         self.saveFinalCycle(finale_cycle)
 
         # La batteria salva anche altre informazioni oltre al proprio ciclo, come il livello di carica
@@ -137,11 +138,12 @@ class Battery(Agent):
     def packDataForWebServer(self):
 
         data = {
-            "name" : self.name,
-            "id"   : self.id,
-            "start": 0,
-            "end"  : consts.kTIME_SLOTS,
-            "ip"   : self.host
+            "name"  : self.name,
+            "id"    : self.id,
+            "start" : 0,
+            "end"   : consts.kTIME_SLOTS,
+            "cycle" : list(self.cycle),
+            "ip"    : self.host
         }
 
         return data

@@ -309,7 +309,7 @@ class Agent:
 
             web_sock.sendto(json.dumps(data).encode(), (myself.broadcast_addr, myself.broadcast_web_port))
             self.debug("Mando info per il web server")
-            time.sleep(5)
+            time.sleep(2)
 
         web_sock.close()
 
