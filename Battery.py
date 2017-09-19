@@ -105,6 +105,8 @@ class Battery(Agent):
                 else:
                     others_cycles[sender_id] = msg.value
 
+        self.msgs = {}
+
         # Calcolo il mio ciclo: dove gli altri agenti usano potenza io mi scarico di una determinata
         # quantità massimo, altrimenti mi carico con l'energia del pannello solare
         finale_cycle    = np.zeros( consts.kTIME_SLOTS )
