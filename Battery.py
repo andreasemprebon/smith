@@ -81,10 +81,11 @@ class Battery(Agent):
             if all_other_agents_cycle_msg_arrived == True:
                 break
 
-            # Se trascorro più di 10 secondi bloccato, esco ed attendo la prossima
+            # Se trascorro più di 30 secondi bloccato, esco ed attendo la prossima
             # ottimizzazione
             elapsed_time = time.time() - start_time
-            if elapsed_time > 10:
+            if elapsed_time > 30:
+                self.debug("Kill per timeout")
                 return False
 
         charge_value    = []
@@ -121,7 +122,7 @@ class Battery(Agent):
             charge_value.append(self.charge)
             charge_perc.append(self.charge / self.max_capacity * 100)
 
-        self.cycle = finale_cycle
+        self.cycle = np.array( finale_cycle )
         self.saveFinalCycle(finale_cycle)
 
         # La batteria salva anche altre informazioni oltre al proprio ciclo, come il livello di carica
