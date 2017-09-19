@@ -217,7 +217,7 @@ class Agent:
         while (True):
             myself.debug("Annuncio agente {} - {}".format(myself.id, myself.host))
             sock.sendto(pdata, (myself.broadcast_addr, myself.broadcast_port) )
-            time.sleep(2)
+            time.sleep(5)
 
         sock.close()
 
@@ -303,6 +303,8 @@ class Agent:
         web_sock.bind(('', myself.broadcast_web_port))
         web_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
+        self.debug("Avvio mando info per il web server")
+
         while (True):
             #data, addr = web_sock.recvfrom(65536)
             #print(addr)
@@ -311,8 +313,8 @@ class Agent:
             data = self.packDataForWebServer()
 
             web_sock.sendto(json.dumps(data).encode(), (myself.broadcast_addr, myself.broadcast_web_port))
-            self.debug("Mando info per il web server")
-            time.sleep(2)
+
+            time.sleep(0.5)
 
         web_sock.close()
 
