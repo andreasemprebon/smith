@@ -81,10 +81,10 @@ class Battery(Agent):
             if all_other_agents_cycle_msg_arrived == True:
                 break
 
-            # Se trascorro più di 30 secondi bloccato, esco ed attendo la prossima
+            # Se trascorro più di 10 secondi bloccato, esco ed attendo la prossima
             # ottimizzazione
             elapsed_time = time.time() - start_time
-            if elapsed_time > 30:
+            if elapsed_time > 10:
                 self.debug("Kill per timeout")
                 return False
 
