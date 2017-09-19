@@ -21,6 +21,8 @@ class DishWasher(Agent):
         self.timeToStartAfter   = None
         self.cycle              = DishWasherCycle.ECO
 
+        self.startDaemonThread(simulation)
+
     def getCycle(self):
         return self.cycle['power']
 

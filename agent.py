@@ -125,6 +125,7 @@ class Agent:
         self.messages_sent_total_size = 0 #bytes
         self.messages_sent_number     = 0
 
+    def startDaemonThread(self, simulation):
         if not simulation:
             # Inizia ad annunciarti e ad ascoltare annunci sulla rete
             self.annouceThread = threading.Thread(  name    = 'Announcing-Thread-of-Agent-' + str( self.id ),

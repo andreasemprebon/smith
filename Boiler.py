@@ -21,6 +21,8 @@ class Boiler(Agent):
         # Genero il file JSON con tutte le possibilita' per il configuratore Web
         self.generateConfigurationForWebServer()
 
+        self.startDaemonThread(simulation)
+
     # Imposta la quantità di acqua calda presente nel boiler
     def setQty(self, val):
         qty = max(val, self.min_qty)

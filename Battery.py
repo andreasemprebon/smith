@@ -23,6 +23,8 @@ class Battery(Agent):
 
         self.optimizableAgent = False
 
+        self.startDaemonThread(simulation)
+
     def setMaxPower(self, max_power):
         self.max_power = max_power  # W
 

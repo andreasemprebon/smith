@@ -21,6 +21,8 @@ class SolarPanel(Agent):
         self.isProducingPower       = True
         self.otherAgentsInfluence   = {}
 
+        self.startDaemonThread(simulation)
+
     def setRadiation(self, rad_type):
         self.radiation_type = rad_type
         self.readRadiation()

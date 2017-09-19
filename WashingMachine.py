@@ -24,6 +24,8 @@ class WashingMachine(Agent):
         # Genero il file JSON con tutte le possibilita' per il configuratore Web
         self.generateConfigurationForWebServer()
 
+        self.startDaemonThread(simulation)
+
     def getCycle(self):
         return self.cycle['power']
 
