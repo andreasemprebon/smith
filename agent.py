@@ -351,6 +351,7 @@ class Agent:
             sender_id = self.id
             pdata = pickle.dumps( (sender_id, type, data) )
         except:
+            self.debug("Errore in sendMsg")
             self.killStartThread = True
             return False
 
