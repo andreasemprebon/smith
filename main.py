@@ -104,15 +104,14 @@ if agent:
         t = threading.Thread( target=agent.start )
         t.setDaemon(True)
         t.start()
-
         start_time = time.time()
 
         while (True):
             t.join(timeout = 5)
             elapsed_time = time.time() - start_time
             if elapsed_time > 60: #Dopo un minuto di ottimizzazione chiudo il thread e lo riapro
+                agent.debug("Kill start thread per timeout")
                 agent.killStartThread = True
-
 
             if t.is_alive():
                 if agent.removeOldDiscoveredAgent():

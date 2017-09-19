@@ -438,7 +438,7 @@ class Agent:
         for id in self.otherAgents:
             a = self.otherAgents[id]
             if not a.optimizableAgent:
-                self.debug("Comunico ciclo a {}".format(id))
+                self.debug("Comunico ciclo ad agente non ottimizzabile {}".format(id))
                 self.sendMsg(id, message.MessageType.FINAL_CYCLE, cycle)
 
     def saveFinalCycle(self, cycle):
@@ -469,6 +469,8 @@ class Agent:
         self.listenToMessagesThread.start()
 
         while (not self.isListening):
+            if self.killStartThread:
+                return False
             time.sleep(0.5)
 
         self.debug("Avviato")
