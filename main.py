@@ -103,13 +103,16 @@ if agent:
 
         t = threading.Thread( target=agent.start )
         t.setDaemon(True)
+
+        agent.otherAgents = {} # HACK
+        time.sleep(5.0)
         t.start()
         start_time = time.time()
 
         while (True):
             t.join(timeout = 5)
             elapsed_time = time.time() - start_time
-            if elapsed_time > 60: #Dopo un minuto di ottimizzazione chiudo il thread e lo riapro
+            if elapsed_time > 45: #Dopo 45 secondi di ottimizzazione chiudo il thread e lo riapro
                 agent.debug("Kill start thread per timeout")
                 agent.killStartThread = True
 
@@ -122,6 +125,6 @@ if agent:
                 break
 
         #agent.start()
-        time.sleep(5.0)
+
 else:
     print("Nessun agente impostato. Esco.")
