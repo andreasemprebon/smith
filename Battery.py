@@ -101,9 +101,9 @@ class Battery(Agent):
             msg = self.msgs[msg_key]
             if msg_type == msgType.FINAL_CYCLE:
                 if self.otherAgents[sender_id].isProducingPower:
-                    solar_panel_cycle = msg.value
+                    solar_panel_cycle = msg.value.copy()
                 else:
-                    others_cycles[sender_id] = msg.value
+                    others_cycles[sender_id] = msg.value.copy()
 
         self.msgs = {}
 

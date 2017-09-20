@@ -217,7 +217,7 @@ class Agent:
         while (True):
             myself.debug("Annuncio agente {} - {}".format(myself.id, myself.host))
             sock.sendto(pdata, (myself.broadcast_addr, myself.broadcast_port) )
-            time.sleep(5)
+            time.sleep(3)
 
         sock.close()
 
