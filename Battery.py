@@ -67,6 +67,8 @@ class Battery(Agent):
     def waitOptimizationEnd(self):
         self.debug("Operazioni post ottimizzazione")
 
+        return False
+        
         # Attendo il ciclo di tutti gli altri agenti coinvolti
         start_time = time.time()
         while True:
@@ -90,8 +92,7 @@ class Battery(Agent):
                 self.debug("Kill per timeout")
                 return False
 
-        return False
-        
+
         charge_value    = []
         charge_perc     = []
 
