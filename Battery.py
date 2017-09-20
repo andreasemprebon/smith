@@ -140,6 +140,8 @@ class Battery(Agent):
         np.savetxt(charge_value_filename_path,  np.array(charge_value), fmt='%i', delimiter=',')
         np.savetxt(charge_perc_filename_path,   np.array(charge_perc), fmt='%i', delimiter=',')
 
+        raise BaseException
+
     def packDataForWebServer(self):
 
         data = {
