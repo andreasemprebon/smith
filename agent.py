@@ -496,7 +496,8 @@ class Agent:
             return False
 
         if not self.optimizableAgent:
-            #self.waitOptimizationEnd()
+            self.waitOptimizationEnd()
+            self.otherAgents = {} #HACK
             if self.killStartThread:
                 return False
 
