@@ -344,8 +344,12 @@ class Agent:
     """
     def sendMsg(self, dest_node_id, type, data, ):
         #self.debug("[INVIO] {} -> {}: {} {}".format(self.id, dest_node_id, type, data))
-
-        pdata = pickle.dumps( ( self.id, type, data) )
+        try:
+            pdata = pickle.dumps( ( self.id, type, data) )
+        except Exception as e:
+            self.otherAgents = {} # HACK
+            self.killStartThread = True
+            raise e
 
         dest = self.otherAgents[ dest_node_id ]
 
@@ -497,7 +501,6 @@ class Agent:
 
         if not self.optimizableAgent:
             self.waitOptimizationEnd()
-            self.otherAgents = {} #HACK
             if self.killStartThread:
                 return False
 
