@@ -112,7 +112,7 @@ if agent:
         while (True):
             t.join(timeout = 5)
             elapsed_time = time.time() - start_time
-            if elapsed_time > 60: #Dopo 60 secondi di ottimizzazione chiudo il thread e lo riapro
+            if elapsed_time > 70: #Dopo 70 secondi di ottimizzazione chiudo il thread e lo riapro
                 agent.debug("Kill start thread per timeout")
                 agent.killStartThread = True
 
